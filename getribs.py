@@ -9,8 +9,8 @@ DAY_STR=['01','02','03','04','05','06','07','08','09','10','11','12','13','14','
 with open("./routeviews-urls.txt") as f:
     routeviewsurls = f.readlines()
 
-month='10' # month to get ribs of.
-year='2015' 
+month='07' # month to get ribs of.
+year='2016' 
 time='0600'
 
 NO_OF_DAYS_IN_MONTH=10 #uptil what date of month to get ribs of. Should be 1 more than day number uptil which you want.
