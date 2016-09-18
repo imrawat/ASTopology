@@ -23,11 +23,12 @@ for ASS in ASES:
 		classes = link['class']
 		colorclass = classes[0]
 		if(colorclass=='green' or colorclass=='black'):
-			ascount+=1
-	mydict[AS]=ascount
-	print str(ascount)+'\n'
-print type(mydict)
-sorted_dict = sorted(mydict.items(), key=operator.itemgetter(1), reverse=True)
+			print link.text()
+#			ascount+=1
+#	mydict[AS]=ascount
+#	print str(ascount)+'\n'
+#print type(mydict)
+#sorted_dict = sorted(mydict.items(), key=operator.itemgetter(1), reverse=True)
 
-for k,v in sorted_dict:
-	print k,v
+#for k,v in sorted_dict:
+#	print k,v
