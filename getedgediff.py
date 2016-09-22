@@ -6,11 +6,11 @@ import requests
 import os
 import sys
 
-f1=sys.argv[1]
-f2=sys.argv[2]
+#f1=sys.argv[1]
+#f2=sys.argv[2]
 
-f1_path='./1to'+f1+'.txt'
-f2_path='./1to'+f2+'.txt'
+#f1_path='./1to'+f1+'.txt'
+#f2_path='./1to'+f2+'.txt'
 
 f1_path='./finalpaths_1_to_100.txt'
 f2_path='./finalpaths_100_to_200.txt'
