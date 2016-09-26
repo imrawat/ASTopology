@@ -29,14 +29,15 @@ key=''
 with open('./ribout.txt') as fi: 
         for line in fi:
 		splits=line.split(' ')
+		EndAS=splits[len(splits)-1]
+		if EndAS[len(EndAS)-1]=='\n':
+			EndAS=EndAS[0:len(EndAS)-1]
 		prefix=splits[0]
-		AS=splits[1]
 		if prefix in prefix_set: #prefix is an EG prefix
 			idx=1
 			for AS in splits[1:len(splits)-1]: 
-				if AS in AS_set: #path other than home AS has an EG AS.
-					#check if remaining AS are also same as this AS
-					print line+'   :   '+AS+' '+str(idx)
+				if AS in AS_set and AS!=EndAS: #path other than home AS has an EG AS.
+					print line+'   :   '+AS
 					fo.write(line)
 					break
 				idx=idx+1		
