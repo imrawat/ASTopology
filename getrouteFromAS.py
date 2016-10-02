@@ -1,3 +1,7 @@
+# Get path from finalpaths.txt
+# Path from an AS within Egypt to Egypt Prefix.
+# Such an AS can be start or intermediatry AS.
+
 EGAS_set=set()
 with open("./EgyptASwoRank.txt") as fi:
         for line in fi:
@@ -17,7 +21,7 @@ with open("./finalpaths.txt") as f2:
 				idx=0
 				line_to_write=''
 				for sp in splits:
-					if idx>ASidx:
+					if idx>ASidx: #check if path is written upto found AS.
 						line_to_write=line_to_write[:len(line_to_write)-1]
 						break #write only uptil index of found AS
 					if idx!=1 and idx!=2 and idx!=3:
@@ -27,6 +31,6 @@ with open("./finalpaths.txt") as f2:
 				print ll+' : '+AS
 				print line_to_write
 				break # An AS found. Continue to next path now.
-			ASidx=ASidx-1
+			ASidx=ASidx-1 #decrement AS index from right
 
 fo.close()
