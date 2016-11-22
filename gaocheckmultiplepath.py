@@ -16,11 +16,11 @@ with open(FILE_NAME) as fi:
 	for line in fi:
 		ll=line[:len(line)-1]
 		splits=ll.split(' ')
-		last = splits[len(splits)-1]
-		if last in asset:
+		home = splits[1]
+		if home in asset:
 			print ll
 			prefix=splits[0]
-			key = prefix+':'+last
+			key = prefix+':'+home
 			if not key in my_dict:
 				my_dict[key]=1
 			else:
