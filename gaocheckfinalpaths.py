@@ -1,5 +1,5 @@
 """
-this program reads a list of ASes in AS_FILE and raw rib file from RAW_RIB
+this program reads a list of ASes in AS_FILE and raw rib file from finalpaths<gao's paths>
 for each path in RAW_RIB it finds for first occurance of any AS in AS_FILE.
 If found it construct a path from that AS to each home prefix.
 Duplicate paths or duplicate ASes within a path are handled(only unique)
@@ -8,10 +8,10 @@ and the no of prefixes to which an AS has multiple paths(multiple)
 """
 
 from collections import OrderedDict
-#1.23.128.0/24 3130 1239 1239 1239 6453 9498 9498 3232 4552 4552 4552
+# 41.128.214.0/24 6 3 169 6127 24863 6762 3216 12695 59498 
 AS_FILE='./all_as.txt'
-RAW_RIB='./ribout.txt'
-OUT_FILE='./gaocheckout.txt'
+RAW_RIB='./finalpaths.txt'
+OUT_FILE='./gaocheckfinalout.txt'
 
 asset=set()
 
@@ -28,14 +28,14 @@ with open(RAW_RIB) as fi:
 		line_num=line_num+1
 		ll=line[:len(line)-1]
 		splits=ll.split(' ')
-		lastAS = splits[len(splits)-1]
-		for AS in splits[1:]:
+		lastAS = splits[4]
+		for AS in splits[len(splits):4:-1]:
 			if AS in asset and AS!=lastAS:
 				#store path from here onwards in a set. ASes in this path should be unique.
 				startidx = splits.index(AS)
-				lastidx=len(splits) #iterate uptil last index
+				lastidx=3 #iterate uptil last index backwards
 				temp_dict=OrderedDict()
-				for index in range(startidx, lastidx):
+				for index in range(startidx, lastidx, -1):
 					if not splits[index] in temp_dict:
 						temp_dict[splits[index]]=1
 
@@ -102,11 +102,6 @@ with open(OUT_FILE, 'w') as fo:
 				fo.write('multiple='+str(multiple_dict[AS])+'\n')
 				print 'mult% = '+str((float(multiple_dict[AS])/float(total_dict[AS]))*100)+'%'
 				fo.write('mult% = '+str((float(multiple_dict[AS])/float(total_dict[AS]))*100)+'%\n')
-			else:
-				print 'multiple=0'
-				fo.write('multiple=0\n')
-				print 'mult% = 0%'
-				fo.write('mult% = 0%\n')
 		else:
 			if not AS in zero_path_set:
 				zero_path_set.add(AS)
