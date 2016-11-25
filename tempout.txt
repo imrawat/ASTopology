@@ -1,0 +1,17 @@
+Server:		192.168.1.7
+Address:	192.168.1.7#53
+
+Non-authoritative answer:
+Name:	www.google.com
+Address: 74.125.200.104
+Name:	www.google.com
+Address: 74.125.200.99
+Name:	www.google.com
+Address: 74.125.200.105
+Name:	www.google.com
+Address: 74.125.200.103
+Name:	www.google.com
+Address: 74.125.200.147
+Name:	www.google.com
+Address: 74.125.200.106
+
