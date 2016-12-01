@@ -1,0 +1,61 @@
+bgp topology load --addr-sch=local "./caidafin.txt"
+bgp topology install
+bgp topology policies
+bgp topology run
+sim run
+bgp router AS8452 add network 23.50.192.0/20
+bgp router AS24863 add network 41.67.64.0/18
+bgp router AS24835 add network 23.218.228.0/22
+bgp router AS36992 add network 41.64.0.0/16
+bgp router AS20928 add network 41.187.0.0/16
+bgp router AS31619 add network 84.205.96.0/19
+bgp router AS6879 add network 195.43.0.0/21
+bgp router AS37437 add network 41.79.208.0/24
+bgp router AS37191 add network 41.78.20.0/22
+bgp router AS31065 add network 41.179.244.0/24
+bgp router AS8524 add network 213.181.224.0/24
+bgp router AS6127 add network 41.128.132.0/22
+bgp router AS37193 add network 164.160.64.0/22
+bgp router AS37031 add network 41.217.224.0/21
+bgp router AS33778 add network 196.201.24.0/21
+bgp router AS30995 add network 41.223.240.0/24
+bgp router AS25576 add network 41.218.128.0/19
+bgp router AS25364 add network 81.29.96.0/23
+bgp router AS37664 add network 196.10.97.0/24
+bgp router AS37585 add network 41.128.192.0/24
+bgp router AS37444 add network 196.43.237.0/24
+bgp router AS37348 add network 196.216.240.0/23
+bgp router AS37270 add network 196.43.198.0/24
+bgp router AS37252 add network 196.223.16.0/23
+bgp router AS37226 add network 196.46.29.0/24
+bgp router AS37112 add network 163.121.166.0/24
+bgp router AS36978 add network 196.3.14.0/23
+bgp router AS36906 add network 196.216.140.0/23
+bgp router AS36885 add network 81.21.101.0/24
+bgp router AS36870 add network 196.22.5.0/24
+bgp router AS328067 add network 164.160.104.0/22
+bgp router AS2561 add network 193.227.0.0/23
+bgp router AS201398 add network 149.91.13.0/24
+bgp router AS15475 add network 41.64.0.0/15
+bgp router AS37583 add network 196.6.185.0/24
+bgp router AS37562 add network 196.6.120.0/24
+bgp router AS37339 add network 196.43.219.0/24
+bgp router AS37279 add network 196.43.201.0/24
+bgp router AS37091 add network 196.216.246.0/24
+bgp router AS37069 add network 41.91.192.0/22
+bgp router AS37066 add network 41.191.80.0/22
+bgp router AS37003 add network 196.12.11.0/24
+bgp router AS36990 add network 41.223.196.0/22
+bgp router AS36935 add network 41.206.128.0/19
+bgp router AS36929 add network 196.1.143.0/24
+bgp router AS36893 add network 196.221.0.0/19
+bgp router AS33785 add network 41.77.136.0/21
+bgp router AS33782 add network 196.204.128.0/18
+bgp router AS33777 add network 196.2.193.0/24
+bgp router AS328052 add network 196.41.83.0/24
+bgp router AS327846 add network 196.216.206.0/24
+bgp router AS327838 add network 196.10.120.0/24
+bgp router AS30993 add network 41.191.24.0/24
+bgp router AS20484 add network 41.209.192.0/22
+bgp router AS15804 add network 212.12.225.0/24
+sim run

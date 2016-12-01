@@ -1,4 +1,6 @@
-#get prefixes for given AS List from CIDR Report
+"""
+Get prefixes for countries specified in AS list from cidr-report.
+"""
 
 import urllib2
 import operator

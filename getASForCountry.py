@@ -1,3 +1,8 @@
+"""
+Get AS list for country specified by country code.
+from http://bgp.he.net
+"""
+
 import urllib2
 import operator
 import requests
