@@ -1,0 +1,58 @@
+AS8452	TE-AS	112	1,683	6	117
+AS24863	LINKdotNET AS number	25	1,255	2	2
+AS24835	Vodafone Data - Egypt	24	490	2	4
+AS36992	Etisalat MISR	23	639	3	162
+AS20928	Noor Advanced Technologies ASN	17	77	1	2
+AS31619	City Stars - Egypt	5	10	0	0
+AS6879	Egyptian National Scientific & Technical Information Network	4	22	0	0
+AS37437	CI Capital Egypt	4	4	0	0
+AS37191	Raya Holding	4	9	0	0
+AS31065	Egyptian Ministry of Communications and Information Technology	4	18	1	1
+AS8524	AUCEGYPT	3	17	0	0
+AS6127	Information and Decision Support Center (IDSC)	3	63	0	0
+AS37193	e-finance	3	2	0	0
+AS37031	MISR Information Services & Trading	3	15	0	0
+AS36971	GPX Egypt	3	1	0	0
+AS33778	Mantrac Group	3	9	0	0
+AS30995	Commercial International Bank (Egypt) AS	3	4	0	0
+AS25576	AFMIC , Egypt	3	22	0	0
+AS25364	Egypt Cyber Cenyer Network	3	16	0	0
+AS37664	Raya Contact Center	2	1	0	0
+AS37585	NSGB	2	2	0	0
+AS37444	SCCT	2	1	0	0
+AS37348	Cairo American College	2	3	0	0
+AS37270	AT-Financial Holding	2	1	0	0
+AS37252	GB AUTO	2	3	0	0
+AS37226	Beltone Financial	2	1	0	0
+AS37112	Dar Al-Handasah	2	5	0	0
+AS36978	EFG-hermes	2	3	0	0
+AS36906	Egyptian Operating Company for Liquefied Natural Gas	2	3	0	0
+AS36885	Egyptian MCIT Internet2	2	1	0	0
+AS36870	IT Worx	2	3	0	0
+AS328067	E.G.I.T. for Technology Services	2	1	0	0
+AS2561	Egyptian Universities Network (EUN)	2	75	0	0
+AS201398	Star Ware for Programming & Internet Services	2	1	0	0
+AS15475	Nile Online	2	19	0	0
+AS37583	Credit Agricole Egypt	1	2	0	0
+AS37562	DrexelEgypt	1	1	0	0
+AS37339	Mediterranean Smart Cards Company	1	2	0	0
+AS37279	Egyptian Banks Company	1	1	0	0
+AS37250	EGYPT AIR	1	1	0	0
+AS37091	Piraeus Bank Egypt	1	1	0	0
+AS37069	The Egyptian Company for Mobile Services (Mobinil)	1	44	0	0
+AS37066	Ministry of Foreign Affairs	1	4	0	0
+AS37003	Xceed Contact Centre	1	2	0	0
+AS36990	Alkan Telecom Ltd	1	4	0	0
+AS36935	Vodafone Egypt Telecommunication S.A.E	1	147	0	0
+AS36929	Central Bank of Egypt	1	1	0	0
+AS36893	Duravit Egypt	1	2	0	0
+AS33785	City Net Telecom	1	17	0	0
+AS33782	Bibliotheca Alexandrina	1	3	0	0
+AS33777	Egypt Network SAE	1	1	0	0
+AS328052	Orascom Construction - Assigned AS	1	1	0	0
+AS327846	Wadi Degla Investments(WDI)	1	1	0	0
+AS327838	Egypt Linx for Communication Services	1	1	0	0
+AS30993	Egypt Centers	1	10	0	0
+AS20484	Yalla Online	1	49	0	0
+AS15804	AS of The Way Out Internet Solutions	1	32	0	0
+AS24736	Egyptian Ministry of Communications and Information Technology
