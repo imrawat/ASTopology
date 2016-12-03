@@ -1,11 +1,11 @@
 import collections
 from collections import OrderedDict
 
-CAIDA_FILE = './tempcaida.txt'
+CAIDA_FILE = './caidarel3.txt'
 CAIDA_16BIT = './caida_16bit.txt'
-OUT_FILE_1='./cbgp_16bit2AS_map.txt'
-OUT_FILE_2='./cbgp_AS216bit_map.txt'
-MAX_AS_NO=10
+OUT_FILE_1='./cbgp_16bit2AS_caida_map.txt'
+OUT_FILE_2='./cbgp_AS216bit_caida_map.txt'
+MAX_AS_NO=65536
 
 temp_dict=dict()
 mapping_dict=OrderedDict()
@@ -44,8 +44,8 @@ with open(CAIDA_FILE) as fi:
 		one_i=int(one)
 		two_i=int(two)
 
-		one_towrite=''
-		two_towrite=''
+		one_towrite='-1'
+		two_towrite='-1'
 		three_towrite=splits[2]
 
 		if one_i>MAX_AS_NO:
@@ -55,7 +55,7 @@ with open(CAIDA_FILE) as fi:
 					temp_dict[str(i)]=one
 					added_as_set.add(one)
 					curr_idx=i+1
-					print lnum
+#					print lnum
 					done=True
 				if done==True:
 					one_towrite=str(i)
@@ -71,14 +71,15 @@ with open(CAIDA_FILE) as fi:
 					added_as_set.add(two)
 					curr_idx=i+1
 					two_towrite=str(i)
-					print lnum
+#					print lnum
 					done=True
 				if done==True:
 					two_towrite=str(i)
 					break
 		else:
 			two_towrite=two
-
+		if one_towrite=='-1' or two_towrite=='-1':
+			print '* '+ll
 		f16.write(one_towrite+' '+two_towrite+' '+three_towrite+'\n')
 
 mapping_dict = collections.OrderedDict(sorted(temp_dict.items()))
