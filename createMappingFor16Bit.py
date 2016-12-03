@@ -9,7 +9,6 @@ MAX_AS_NO=65535
 temp_dict=dict()
 mapping_dict=OrderedDict()
 
-
 curr_idx=1
 
 with open(CAIDA_FILE) as fi:
@@ -59,14 +58,16 @@ with open(CAIDA_FILE) as fi:
 mapping_dict = collections.OrderedDict(sorted(temp_dict.items()))
 
 print OUT_FILE_1
-fo=open(OUT_FILE_1, 'w')
-
+fo1=open(OUT_FILE_1, 'w')
+fo2=open(OUT_FILE_2, 'w')
 try:
 	for key in mapping_dict:
 		print key+' '+mapping_dict[key]
-		fo.write(key+' '+mapping_dict[key]+'\n')
+		fo1.write(key+' '+mapping_dict[key]+'\n')
+		fo2.write(mapping_dict[key]+' '+key+'\n')
 finally:
-	fo.close()
+	fo1.close()
+	fo2.close()
 
 
 
