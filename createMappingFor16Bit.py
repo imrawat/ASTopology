@@ -5,9 +5,10 @@ CAIDA_FILE = './caidarel3.txt'
 CAIDA_16BIT = './caida_16bit.txt'
 OUT_FILE_1='./cbgp_16bit2AS_caida_map.txt'
 OUT_FILE_2='./cbgp_AS216bit_caida_map.txt'
-MAX_AS_NO=65536
+MAX_AS_NO=65535
 
 temp_dict=dict()
+AS_2_16bit_dict=dict()
 mapping_dict=OrderedDict()
 
 curr_idx=1
@@ -30,9 +31,6 @@ with open(CAIDA_FILE) as fi:
 			if not two in temp_dict:
 				temp_dict[two]=two
 
-
-added_as_set=set()
-
 with open(CAIDA_FILE) as fi:
 	lnum=0
 	for line in fi:
@@ -50,36 +48,32 @@ with open(CAIDA_FILE) as fi:
 
 		if one_i>MAX_AS_NO:
 			for i in range(curr_idx, MAX_AS_NO+1):
-				done=False
-				if not str(i) in temp_dict and not one in added_as_set:
+				if not str(i) in temp_dict and not one in AS_2_16bit_dict:
 					temp_dict[str(i)]=one
-					added_as_set.add(one)
+					AS_2_16bit_dict[one]=str(i)
 					curr_idx=i+1
-#					print lnum
-					done=True
-				if done==True:
-					one_towrite=str(i)
+					print lnum
 					break
+			one_towrite=AS_2_16bit_dict[one]
 		else:
 			one_towrite=one
+		if one_towrite=='-1':
+			print '1 '+str(i)+' '+str(len(temp_dict))+' '+str(curr_idx)
 
 		if two_i>MAX_AS_NO:
 			for i in range(curr_idx, MAX_AS_NO+1):
-				done=False
-				if not str(i) in temp_dict and not two in added_as_set:
+				if not str(i) in temp_dict and not two in AS_2_16bit_dict:
 					temp_dict[str(i)]=two
-					added_as_set.add(two)
+					AS_2_16bit_dict[two]=str(i)
 					curr_idx=i+1
-					two_towrite=str(i)
-#					print lnum
-					done=True
-				if done==True:
-					two_towrite=str(i)
-					break
+					print lnum
+			two_towrite=AS_2_16bit_dict[two]
 		else:
 			two_towrite=two
-		if one_towrite=='-1' or two_towrite=='-1':
-			print '* '+ll
+
+		if two_towrite=='-1':
+			print '2 '+str(i)+' '+str(len(temp_dict))+' '+str(curr_idx)
+
 		f16.write(one_towrite+' '+two_towrite+' '+three_towrite+'\n')
 
 mapping_dict = collections.OrderedDict(sorted(temp_dict.items()))
