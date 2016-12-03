@@ -2,6 +2,8 @@
 Get AS of a prefixes in list.
 Used selenium to browse bgp.he.net as BeautifulSoup get javascript disabled error.
 Note: chromedriver path is required for selenium to work.
+WARNING: Have control over no of requests made to bgp.he.net. Too many requests in a day
+may lead to ip blocking.
 """
 
 import urllib2
