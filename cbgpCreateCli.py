@@ -52,6 +52,11 @@ with open(prefix_file) as fi:
 		AS = splits[0]
 		num=AS[2:]
 		prefix = splits[1]
+
+		if not num in mapping_dict:
+			print num+' not in caida'
+			continue
+
 		if not prefix in prefix_set:
 			prefix_set.add(prefix)
 
@@ -68,6 +73,9 @@ with open(as_list) as fi:
 	for line in fi:
 		ll=line[:len(line)-1]
 		num=ll[2:]
+		if not num in mapping_dict:
+			print num+' not in caida'
+			continue
 		AS_16bit=mapping_dict[num]
 		for prefix in prefix_set:
 			com = 'bgp router '+AS_16bit+' record-route '+prefix
