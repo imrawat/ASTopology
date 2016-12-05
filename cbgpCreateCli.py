@@ -1,14 +1,20 @@
 """
 Create a .cli file for C-BGP which will load prefixes to AS and 
 use traceroute to get path from AS to a particular prefix.
+Uses alias as 16bit AS numbers
 """
 
 COUNTRY_CODE='EG'
-
+#File containing the AS number and its corresponding prefix to be added. This prefix will be the same which will be tracerouted.
 prefix_file='./'+COUNTRY_CODE+'_ASPrefixes.txt'
+
+#File containing the ASes from which traceroute will be done to prefixes
 as_list = './'+COUNTRY_CODE+'_AS.txt'
 
+#16bit mapped AS list
 CAIDA_REL_16BIT='./caida_16bit.txt'
+
+#AS to its 16bit alias mapping.
 AS_TO_16BIT_MAPPING='./cbgp_AS216bit_caida_map.txt'
 
 
@@ -30,7 +36,7 @@ prefix_set = set()
 
 
 """
-Save AS to 16bit mapping
+Save AS to 16bit mapping in a dict.
 """
 mapping_dict=dict()
 with open(AS_TO_16BIT_MAPPING) as fi:
@@ -61,7 +67,7 @@ with open(prefix_file) as fi:
 			prefix_set.add(prefix)
 
 		# add to mapped 16bit AS instead of actual AS numbers
-		AS_16bit=mapping_dict[num]
+		AS_16bit='AS'+mapping_dict[num]
 		com = 'bgp router '+AS_16bit+' add network '+prefix
 		fo.write(com+'\n')
 fo.write('sim run\n')
@@ -76,7 +82,7 @@ with open(as_list) as fi:
 		if not num in mapping_dict:
 			print num+' not in caida'
 			continue
-		AS_16bit=mapping_dict[num]
+		AS_16bit='AS'+mapping_dict[num]
 		for prefix in prefix_set:
 			com = 'bgp router '+AS_16bit+' record-route '+prefix
 			print com
