@@ -5,7 +5,7 @@ Get prefixes for countries specified in AS list from cidr-report.
 import urllib2
 import operator
 from bs4 import BeautifulSoup
-COUNTRY_CODE = 'EG'
+COUNTRY_CODE = 'IN'
 
 AS_LIST_TO_RANK = './'+COUNTRY_CODE+'_AS.txt'
 
