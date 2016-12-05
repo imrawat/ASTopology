@@ -1,7 +1,12 @@
+"""
+Creates a mapping of AS numbers to 16bit aliases and vice versa.
+Also converts the caida file into its 16bit aliased version.
+"""
 import collections
 from collections import OrderedDict
 
-CAIDA_FILE = './caidarel3.txt'
+
+CAIDA_FILE = './caidarel3.txt'  
 CAIDA_16BIT = './caida_16bit.txt'
 OUT_FILE_1='./cbgp_16bit2AS_caida_map.txt'
 OUT_FILE_2='./cbgp_AS216bit_caida_map.txt'
@@ -15,6 +20,7 @@ curr_idx=1
 
 f16=open(CAIDA_16BIT, 'w')
 
+"""read caida file and save valid AS numbers in dict"""
 with open(CAIDA_FILE) as fi:
 	for line in fi:
 		ll=line[:len(line)-1]
@@ -31,6 +37,8 @@ with open(CAIDA_FILE) as fi:
 			if not two in temp_dict:
 				temp_dict[two]=two
 
+#read caida file and create a mapped version of it.
+#also create a mapping dict of 16bit to AS numbers.
 with open(CAIDA_FILE) as fi:
 	lnum=0
 	for line in fi:
@@ -74,6 +82,7 @@ with open(CAIDA_FILE) as fi:
 		if two_towrite=='-1':
 			print '2 '+str(i)+' '+str(len(temp_dict))+' '+str(curr_idx)
 
+		#write out the mapped line of caida file
 		f16.write(one_towrite+' '+two_towrite+' '+three_towrite+'\n')
 
 mapping_dict = collections.OrderedDict(sorted(temp_dict.items()))
@@ -83,6 +92,8 @@ print OUT_FILE_2
 print CAIDA_16BIT
 fo1=open(OUT_FILE_1, 'w')
 fo2=open(OUT_FILE_2, 'w')
+
+#write mappings to and from 16bit to AS numbers.
 try:
 	for key in mapping_dict:
 		print key+' '+mapping_dict[key]
