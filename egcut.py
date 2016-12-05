@@ -4,8 +4,25 @@ import itertools
 
 pf_dict={}
 
+IS_CBGP=True
+
+#16bit AS to AS mapping
+BIT16_TO_AS_MAPPING='./cbgp_16bit2AS_caida_map.txt'
+
+"""
+Save AS to 16bit mapping in a dict.
+"""
+mapping_dict=dict()
+if IS_CBGP:
+	with open(BIT16_TO_AS_MAPPING) as fi:
+		for line in fi:
+			ll=line[:len(line)-1]
+			splits=ll.split(' ')
+			if not splits[0] in mapping_dict:
+				mapping_dict[splits[0]]=splits[1]
+
 G=nx.Graph()
-with open('./EG2EG_finalpaths.txt') as fi:
+with open('./gao_cbgp_paths.txt') as fi:
 	count=0
 	for line in fi:
 		ll=line[:len(line)-1]
@@ -25,7 +42,12 @@ with open('./EG2EG_finalpaths.txt') as fi:
 				if not currAS in temp_set:
 					temp_set.add(currAS)
 			if currAS!=nextAS: # both vertex should not be same
-				G.add_edge(currAS, nextAS)
+				if IS_CBGP:
+					actualCurrentAS=mapping_dict[currAS]
+					actualNextAS=mapping_dict[nextAS]
+					G.add_edge(actualCurrentAS, actualNextAS)
+				else:
+					G.add_edge(currAS, nextAS)
 
 		#increase path freq by 1 for all non start and home AS found in above path.
 		for AS in temp_set:
@@ -42,30 +64,30 @@ for node in G.nodes():
 	if len(G.neighbors(node))==1:
 		G.remove_node(node)
 
-r = nx.node_connectivity(G)
+# r = nx.node_connectivity(G)
 
-possible_cuts = itertools.combinations(iter(G.nodes()), r)
+# possible_cuts = itertools.combinations(iter(G.nodes()), r)
 
-max_pf=0
-max_cut=()
-tie=False
-for possible_cut in possible_cuts:
-	H = G.copy()
-	H.remove_nodes_from(possible_cut)
-	if not nx.is_connected(H):
-		pf=0
-		for node in possible_cut:
-			pf=pf_dict[node]+pf
-		print possible_cut, pf
-		if(pf>max_pf):
-			max_pf=pf
-			max_cut=possible_cut
-			tie=False
-		elif (pf==max_pf) and pf>0:
-			tie=True
+# max_pf=0
+# max_cut=()
+# tie=False
+# for possible_cut in possible_cuts:
+# 	H = G.copy()
+# 	H.remove_nodes_from(possible_cut)
+# 	if not nx.is_connected(H):
+# 		pf=0
+# 		for node in possible_cut:
+# 			pf=pf_dict[node]+pf
+# 		print possible_cut, pf
+# 		if(pf>max_pf):
+# 			max_pf=pf
+# 			max_cut=possible_cut
+# 			tie=False
+# 		elif (pf==max_pf) and pf>0:
+# 			tie=True
 
-print '\n'
-print max_cut, max_pf
+# print '\n'
+# print max_cut, max_pf
 
 pos = nx.spring_layout(G)
 nx.draw_networkx_nodes(G, pos=pos, nodelist = G.nodes())

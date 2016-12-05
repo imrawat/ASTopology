@@ -1,12 +1,18 @@
 """
 Convert CBGP traceroute paths to GAO output 
 format paths.
+
+CBGP format: 0.0.27.106 130.104.0.0/16 SUCCESS 7018 3303 2611
+GAO format: 130.104.0.0/16 2611 3303 7018
 """
+
+#File having CBGP format traceroute paths
+in_file='./cbgrecord-route.txt'
 
 out_file='./gao_cbgp_paths.txt'
 fo=open(out_file, 'w')
 
-with open('./cbgrecord-route.txt') as fi:
+with open(in_file) as fi:
 	for line in fi:
 		ll=line[:len(line)-1]
 		splits=ll.split('\t')
