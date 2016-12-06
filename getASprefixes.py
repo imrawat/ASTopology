@@ -12,7 +12,7 @@ AS_LIST_TO_RANK = './'+COUNTRY_CODE+'_AS.txt'
 with open(AS_LIST_TO_RANK) as f:
 	ASES = f.readlines()
 
-out_file = './'+COUNTRY_CODE+'_ASPrefixes.txt'
+out_file = './'+COUNTRY_CODE+'_ASPrefixes2.txt'
 
 fo=open(out_file, 'w')
 

@@ -4,7 +4,7 @@ use traceroute to get path from AS to a particular prefix.
 Uses alias as 16bit AS numbers
 """
 
-COUNTRY_CODE='EG'
+COUNTRY_CODE='IN'
 #File containing the AS number and its corresponding prefix to be added. This prefix will be the same which will be tracerouted.
 prefix_file='./'+COUNTRY_CODE+'_ASPrefixes.txt'
 
