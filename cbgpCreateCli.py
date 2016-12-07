@@ -4,12 +4,14 @@ use traceroute to get path from AS to a particular prefix.
 Uses alias as 16bit AS numbers
 """
 
-COUNTRY_CODE='IN'
+COUNTRY_CODE='EG'
+
 #File containing the AS number and its corresponding prefix to be added. This prefix will be the same which will be tracerouted.
 prefix_file='./'+COUNTRY_CODE+'_ASPrefixes.txt'
 
 #File containing the ASes from which traceroute will be done to prefixes
 as_list = './'+COUNTRY_CODE+'_AS.txt'
+as_list = './all_as.txt'
 
 #16bit mapped AS list
 CAIDA_REL_16BIT='./caida_16bit.txt'
@@ -24,6 +26,7 @@ out_file='./'+COUNTRY_CODE+'_cli.cli'
 fo = open(out_file, 'w')
 
 print 'prefix_file : '+prefix_file
+print 'AS lsit : '+as_list
 print 'out_file :'+out_file
 
 fo.write('bgp topology load --addr-sch=local \"'+CAIDA_REL_16BIT+'\"\n')
