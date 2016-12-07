@@ -1,8 +1,14 @@
+"""
+Gets all unique AS from caida file.
+Used for getting a list of all ASes world over
+"""
+
 my_set=set()
 
+CAIDA_FILE='./caidarel.txt'
 OUT_FILE='all_as.txt'
 
-with open('./caidarel.txt') as fi:
+with open(CAIDA_FILE) as fi:
 	for line in fi:
 		ll=line[:len(line)-1]
 		splits=ll.split(' ')
