@@ -46,10 +46,6 @@ with open(RAW_RIB) as fi:
 				if not hkey in path_set:
 					print str(line_num)+' '+hkey
 					path_set.add(hkey)
-
-	# print 
-	# for key in path_set:
-	# 	print key
 print
 
 my_dict=dict()

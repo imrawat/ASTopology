@@ -9,6 +9,9 @@ IS_CBGP=True
 #16bit AS to AS mapping
 BIT16_TO_AS_MAPPING='./cbgp_16bit2AS_caida_map.txt'
 
+#path file
+PATH_FILE='./cbgpEG2EG_finalpaths.txt'
+
 """
 Save AS to 16bit mapping in a dict.
 """
@@ -22,10 +25,11 @@ if IS_CBGP:
 				mapping_dict[splits[0]]=splits[1]
 
 G=nx.Graph()
-with open('./gao_cbgp_paths.txt') as fi:
+with open(PATH_FILE) as fi:
 	count=0
 	for line in fi:
-		ll=line[:len(line)-1]
+		ll=line.strip()
+		# ll=line[:len(line)-1]
 		# print ll
 		splits=ll.split(' ')
 		temp_set=set()
