@@ -26,8 +26,8 @@ print 'OUT_FILE : '+OUT_FILE
 
 print 
 
-COUNTRY_AS_LIST = './tempas.txt'
-PATH_FILE = "./temppath.txt"
+#COUNTRY_AS_LIST = './tempas.txt'
+#PATH_FILE = "./temppath.txt"
 
 EGAS_set=set()
 with open(COUNTRY_AS_LIST) as fi:
