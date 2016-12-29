@@ -4,6 +4,10 @@ import os
 
 from os.path import basename
 
+if len(sys.argv) < 3:
+        print "Usage: python decompress_ribs.py <from_folder> <to_folder>"
+        exit()
+
 folder='./'+sys.argv[1]
 
 folderstart=sys.argv[1]
@@ -17,9 +21,7 @@ for folder in range(int(folderstart), (int(folderend)+1)):
 	for file in os.listdir(folder_path):
 		if file.endswith(".bz2"):
 	        	print file
-        	#if(sys.argv[1]=='8' and (file=='RIB07.bz2' or file=='RIB08.bz2')):
-                #	print 'skipping..'
-                #	continue;
+
         		file_no_ext =  os.path.splitext(file)[0]
 	        	file_path=folder_path+'/'+file
         		save_path=folder_path+'/'+file_no_ext+'.bin'
