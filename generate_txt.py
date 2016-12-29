@@ -4,6 +4,7 @@ import sys
 if len(sys.argv) < 3:
         print "Usage: python generate_txt.py <from_folder> <to_folder>"
         exit()
+        
 
 folderstart=sys.argv[1]
 folderend=sys.argv[2]

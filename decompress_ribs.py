@@ -4,6 +4,7 @@ import os
 
 from os.path import basename
 
+
 if len(sys.argv) < 3:
         print "Usage: python decompress_ribs.py <from_folder> <to_folder>"
         exit()
