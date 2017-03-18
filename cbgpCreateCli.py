@@ -4,14 +4,13 @@ use traceroute to get path from AS to a particular prefix.
 Uses alias as 16bit AS numbers
 """
 
-COUNTRY_CODE='EG'
+COUNTRY_CODE='CD'
 
 #File containing the AS number and its corresponding prefix to be added. This prefix will be the same which will be tracerouted.
 prefix_file='./'+COUNTRY_CODE+'_ASPrefixes.txt'
 
 #File containing the ASes from which traceroute will be done to prefixes
 as_list = './'+COUNTRY_CODE+'_AS.txt'
-as_list = './all_as.txt'
 
 #16bit mapped AS list
 CAIDA_REL_16BIT='./caida_16bit.txt'
@@ -54,6 +53,8 @@ with open(AS_TO_16BIT_MAPPING) as fi:
 add prefixes to CBGP routers. Router numbers are mapping of 
 actual AS numbers to 16bit aliases.
 """
+
+count=1
 with open(prefix_file) as fi:
 	for line in fi:
 		ll=line[:len(line)-1]
@@ -72,9 +73,17 @@ with open(prefix_file) as fi:
 		# add to mapped 16bit AS instead of actual AS numbers
 		AS_16bit='AS'+mapping_dict[num]
 		com = 'bgp router '+AS_16bit+' add network '+prefix
+		print com
 		fo.write(com+'\n')
-fo.write('sim run\n')
+		fo.write('time save\n')
+		fo.write('sim run\n')
+		fo.write('print '+"\""+str(count)+' '+com+":\"   \n")
+		fo.write('time diff   \n')
+		count=count+1
 
+
+print
+print
 """
 traceroute commands
 """

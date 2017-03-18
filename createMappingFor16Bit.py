@@ -6,7 +6,7 @@ import collections
 from collections import OrderedDict
 
 
-CAIDA_FILE = './caidarel3.txt'  
+CAIDA_FILE = './caidarel.txt'  
 CAIDA_16BIT = './caida_16bit.txt'
 OUT_FILE_1='./cbgp_16bit2AS_caida_map.txt'
 OUT_FILE_2='./cbgp_AS216bit_caida_map.txt'

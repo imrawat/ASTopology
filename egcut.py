@@ -10,7 +10,7 @@ IS_CBGP=True
 BIT16_TO_AS_MAPPING='./cbgp_16bit2AS_caida_map.txt'
 
 #path file
-PATH_FILE='./cbgpEG2EG_finalpaths.txt'
+PATH_FILE='./cbgpEG2EG_finalpaths2.txt'
 
 """
 Save AS to 16bit mapping in a dict.

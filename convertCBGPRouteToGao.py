@@ -2,7 +2,8 @@
 Convert CBGP traceroute paths to GAO output 
 format paths.
 
-CBGP format: 0.0.27.106 130.104.0.0/16 SUCCESS 7018 3303 2611
+CBGP format: 0.0.27.106 130.104.0.0/16 SUCCESS 7018 3303 2611 <where 7018 is start AS and 2611 
+is home AS consisting of destination prefix>
 GAO format: 130.104.0.0/16 2611 3303 7018
 """
 

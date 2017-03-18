@@ -1,5 +1,5 @@
 """
-this program reads a list of ASes in AS_FILE and raw rib file from finalpaths<gao's paths>
+this program reads a list of ASes in AS_FILE and path from finalpaths<gao's paths>
 for each path in RAW_RIB it finds for first occurance of any AS in AS_FILE.
 If found it construct a path from that AS to each home prefix.
 Duplicate paths or duplicate ASes within a path are handled(only unique)
