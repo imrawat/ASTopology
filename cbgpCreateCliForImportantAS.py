@@ -25,7 +25,7 @@ AS_TO_16BIT_MAPPING='./cbgp_AS216bit_caida_map.txt'
 
 
 # cli file which will add prefixes to AS routers of the country 
-out_file='./'+COUNTRY_CODE+'_cli.cli'
+out_file='./'+COUNTRY_CODE+'_imp.cli'
 
 fo = open(out_file, 'w')
 
@@ -72,6 +72,8 @@ for prefix_file in important_prefix_files:
 	with open(prefix_file) as fi:
 		for line in fi:
 			ll=line.strip()
+			if ll[0] == "#":
+				continue
 			splits=ll.split(' ')
 			num = splits[2]
 			prefix = splits[1]
@@ -85,7 +87,7 @@ for prefix_file in important_prefix_files:
 
 			# add to mapped 16bit AS instead of actual AS numbers
 			AS_16bit='AS'+mapping_dict[num]
-			prefix = prefix+'/22'
+			prefix = prefix+'/32'
 			com = 'bgp router '+AS_16bit+' add network '+prefix
 			print com
 			fo.write(com+'\n')
@@ -111,7 +113,7 @@ with open(as_list) as fi:
 			continue
 		AS_16bit='AS'+mapping_dict[num]
 		for prefix in prefix_set:
-			prefix = prefix+'/22'
+			prefix = prefix+'/32'
 			com = 'bgp router '+AS_16bit+' record-route '+prefix
 			print com
 			fo.write(com+'\n') 		
