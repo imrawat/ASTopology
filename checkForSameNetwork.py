@@ -1,4 +1,4 @@
-INFILE = "CN_govt.txt"
+INFILE = "CN_transport.txt"
 # AS35553 192.115.240.0/22
 
 IS_IMP_AS = True

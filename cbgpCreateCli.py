@@ -27,12 +27,12 @@ if __name__ == "__main__":
 
 
 	# cli file which will add prefixes to AS routers of the country 
-	out_file='./'+COUNTRY_CODE+'_country_all.cli'
+	out_file='./'+COUNTRY_CODE+'_country_50.cli'
 
 	fo = open(out_file, 'w')
 
 	print 'prefix_file : '+prefix_file
-	print 'AS lsit : '+as_list
+	print 'AS list : '+as_list
 	print 'out_file :'+out_file
 
 	fo.write('bgp topology load --addr-sch=local \"'+CAIDA_REL_16BIT+'\"\n')

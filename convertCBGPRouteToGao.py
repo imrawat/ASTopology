@@ -20,14 +20,24 @@ if __name__ == "__main__":
 
 	COUNTRY_CODE = sys.argv[1]
 	MODE = sys.argv[2]
-
+	domains = ['bank', 'govt', 'transport']
+	DOMAIN_SUFFIX = ""
 	if MODE == "1":
 		PATH_SUFFIX = "_country_all"
 	elif MODE == "2":
 		PATH_SUFFIX = "_imp"
+		print "domains " + str(domains)
+		selected_imp_str = raw_input("Enter choice ")
+		selected_imp = int(selected_imp_str)
+		if selected_imp > len(domains):
+			print "invalid selected_imp " + selected_imp_str
+			exit()
+		DOMAIN_SUFFIX = "_" + domains[selected_imp - 1]
 
-	OUT_FILE="./"+COUNTRY_CODE+"_gao_cbgp_paths" + PATH_SUFFIX + ".txt"
-	IN_FILE="./"+COUNTRY_CODE+"_cbgp_trace" + PATH_SUFFIX + ".txt"
+
+
+	OUT_FILE="./"+COUNTRY_CODE+"_gao_cbgp_paths" + PATH_SUFFIX + DOMAIN_SUFFIX + ".txt"
+	IN_FILE="./"+COUNTRY_CODE+"_cbgp_trace" + PATH_SUFFIX + DOMAIN_SUFFIX + ".txt"
 	print "OUT_FILE " + OUT_FILE
 	print "IN_FILE " + IN_FILE
 

@@ -1,0 +1,5 @@
+*.txt
+*.cli
+*.pyc
+*.sqlite
+*.DS_Store
