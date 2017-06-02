@@ -86,15 +86,14 @@ class NodeCutDirected :
 		pf_dict = {}
 
 		done = False
-		while (done == False or not len(self.selected_domains) == self.DOMAINS):
+		while (done == False and (not len(self.selected_domains) == self.DOMAINS)):
 			'''
 			Input from user the important locations to which to draw graph to
 			'''
 			print "domains " + str(self.DOMAINS)
 			print "options " + str(range(1, len(self.DOMAINS) + 1))
 			selected_imp = raw_input("Enter space separated choice. Currently single choice only. 0 to EXIT? ")
-
-			if selected_imp == '0':
+			if selected_imp == '0' or selected_imp == 0:
 				done = True
 				continue
 			
@@ -372,10 +371,6 @@ if __name__ == "__main__":
 	else:
 		NC.node_cut_to_all()
 
-	
-	fo = open("temp.txt", "w")
-	for cut_vertex in union:
-		fo.write(cut_vertex+"\n");
 
 
 

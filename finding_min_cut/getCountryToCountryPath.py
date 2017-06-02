@@ -7,7 +7,7 @@ IS_CAIDA = True
 if IS_CAIDA:
 	print "*** CAIDA is Enabled ***"
 
-COUNTRY_CODE='EG'
+COUNTRY_CODE='IL'
 
 COUNTRY_AS_LIST='./'+COUNTRY_CODE+'_AS.txt'
 print 'COUNTRY_AS_LIST : '+COUNTRY_AS_LIST

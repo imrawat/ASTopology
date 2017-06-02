@@ -34,6 +34,7 @@ def find_cuts(G):
 
 	print '\n'
 	print max_cut, max_pf
+	print '\n'
 	G.remove_nodes_from(max_cut)
 	remainingGs = list(nx.connected_component_subgraphs(G))
 
