@@ -1,9 +1,20 @@
+# !/usr/bin/env python
+# Name :  Madhur Rawat
+# Organization: IIIT Delhi
+# Date : 15/12/16
+
+'''
+Find min node cut in graph
+Either in country to country topology or in attacker to victim topology
+Using either start AS or not
+'''
+
+from __future__ import division
 import matplotlib.pyplot as plt
 import itertools
 import sys
 import math
 import argparse
-import min_cut_constants
 import networkx as nx
 from networkx.algorithms.connectivity import local_node_connectivity
 from collections import defaultdict
@@ -13,14 +24,19 @@ from networkx.algorithms.connectivity import (build_auxiliary_node_connectivity)
 from networkx.algorithms.flow import build_residual_network
 
 # Local imports
+import min_cut_constants
+from min_cut_utility import BFS
+from min_cut_utility import print_path_if_reachable
 from as_graph_utility import as_digraph
 from as_graph_utility import is_reachable
 from as_graph_utility import paths_between_st
-from multiple_minimum_st_node_cut import multiple_minimum_st_node_cut
+from minimum_st_node_cut import multiple_minimum_st_node_cut
+from minimum_st_node_cut import zero_capacity_residual_paths
+from heuristic_min_st_node_cut_impl import defense_st_cut
 
 
 '''
-"Usage: python prog.py <COUNTRY_CODE> <MODE> <S/N>"
+"Usage: python prog.py -c <COUNTRY_CODE> -m <MODE> -s <S/N>"
 "MODE:"
 "   1: country all to all"
 "   2: country to imp"
@@ -59,35 +75,61 @@ class NodeCutDirected :
 
 
 	def node_cut_to_important(self) :
-		dest_as_list = []
-		for selected_domain in self.selected_domains:
-			domain = self.DOMAINS[int(selected_domain) - 1]
+		
+
+		union = set()
+
+		# Every time a new domain is added we will add the paths for it to already created graph
+		G = nx.DiGraph()
+
+		# Every time a new domain is added we need to update the pf_dict with new values for nodes.
+		pf_dict = {}
+
+		done = False
+		while (done == False or not len(self.selected_domains) == self.DOMAINS):
+			'''
+			Input from user the important locations to which to draw graph to
+			'''
+			print "domains " + str(self.DOMAINS)
+			print "options " + str(range(1, len(self.DOMAINS) + 1))
+			selected_imp = raw_input("Enter space separated choice. Currently single choice only. 0 to EXIT? ")
+
+			if selected_imp == '0':
+				done = True
+				continue
+			
+			if not selected_imp.isdigit() or (int(selected_imp) - 1) > (len(self.DOMAINS) - 1) or selected_imp in self.selected_domains:
+				print "invalid selected_imp or already selected " + selected_imp
+				continue
+
+			self.selected_domains.append(selected_imp)
+
+			domain = self.DOMAINS[int(selected_imp) - 1]
 			domain_file = './'+self.COUNTRY_CODE+'_'+domain+'.txt'
 
-			self.add_dest_as(domain_file, dest_as_list)
+			# donot use. use all_dest_as instead from actual paths
+			# self.add_dest_as(domain_file, dest_as_list) 
 
-			PATH_FILE="./"+self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_domain) - 1] + ".txt"
+			PATH_FILE="./"+self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
 			print "PATH_FILE " + PATH_FILE
 			
 			mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
 			
-			G, all_as_set = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, dest_as_list)
-			
-			union = set()
-
+			(G, all_start_as, all_dest_as, pf_dict) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, G, pf_dict)
+			print 'pf_dict', pf_dict
 			# Remove nodes with low neighbour count
 			# Donot remove if its destination node. 
 			# TODO: Check if this is required.
-			for node in G.nodes():
-				if not node in dest_as_list and len(G.in_edges(node)) < 2:
-					all_neighbor_victims = True
-					for neighbor in G.neighbors(node):
-						if not neighbor in dest_as_list:
-							all_neighbor_victims = False
-							break
-					if all_neighbor_victims:
-						G.remove_node(node)
-						all_as_set.remove(node)
+			# for node in G.nodes():
+			# 	if not node in all_dest_as and len(G.in_edges(node)) < 2:
+			# 		all_neighbor_victims = True
+			# 		for neighbor in G.neighbors(node):
+			# 			if not neighbor in all_dest_as:
+			# 				all_neighbor_victims = False
+			# 				break
+			# 		if all_neighbor_victims:
+			# 			G.remove_node(node)
+			# 			all_as_set.remove(node)
 
 
 			if self.USING_START:
@@ -105,59 +147,83 @@ class NodeCutDirected :
 					else:
 						print "warning: graph does not have node : " + dest
 			else:
-				# print
-				# print "len(all_as_set) " + str(len(all_as_set))
-				# print "len(dest_as_list) " + str(len(dest_as_list))
-				# print
-				for AS in all_as_set:
-					# Choose non destination as source
-					if not AS in dest_as_list:
-						for dest in dest_as_list:
-							if dest in all_as_set:
-								'''
-								'''
-								# AS = '3491'
-								# dest = '55824'
+				print
+				print "len(all_start_as) " + str(len(all_start_as))
+				print "len(all_dest_as) " + str(len(all_dest_as))
+				print
+				for i, AS in enumerate(all_start_as):
+					for dest in all_dest_as:
+						if not AS == dest:
 
-								st_cuts, single_st_cut = multiple_minimum_st_node_cut(G, AS, dest)
-								print AS, dest
-								paths_between_st(G, AS, dest)
-								print 'st_cuts ' + str(st_cuts)
-								for st_cut in st_cuts:
-									H = G.copy()
-									H.remove_nodes_from(st_cut)
-									print "st_cut " + str(st_cut)
-									paths_between_st(H, AS, dest)
-									print
-								print
-								# if len_st_cut <= 200:
-								# 	union.update(st_cut)
-								# else:
-								# 	union.add(dest)
-							else:
-								print "warning: graph does not have node : " + dest
-							raw_input("Press any key to continue...")
+							print i, 'AS', AS, 'dest', dest
+							defense_cut = defense_st_cut(G, AS, dest, min_cut_constants.HEURISTIC.PATH_FREQUENCY)
+							print '* defense_cut', defense_cut
+							print '*'*50
+							union.update(defense_cut)
 
+
+
+							# print 'AS:', AS, ' dest:', dest
+							# max_pf = float('-inf')
+							# max_cut=()
+							# st_cuts, single_st_cut, max_possible_combinations = multiple_minimum_st_node_cut(G, AS, dest)
+							# print 'len(st_cuts)', len(st_cuts)
+							# print 'single_st_cut', single_st_cut
+							# if not max_possible_combinations == None and max_possible_combinations > min_cut_constants.MAXIMUM_POSSIBLE_COMBINATIONS_DIRECTED:
+							# 	st_cuts = []
+							# 	st_cuts.append(single_st_cut)
+							# elif len(st_cuts) > min_cut_constants.MAXIMUM_ALLOWED_ST_CUTS_COMBINATIONS_DIRECTED:
+							# 	st_cuts = []
+							# 	st_cuts.append(single_st_cut)
+
+
+
+							# for st_cut in st_cuts:
+							# 	H = G.copy()
+							# 	H.remove_nodes_from(st_cut)
+							# 	if not is_reachable(H, AS, dest):
+
+							# 		pf = 0
+							# 		for cut_node in st_cut:
+							# 			pf = pf + pf_dict[cut_node]
+							# 		# print 'st_cut', st_cut,'pf', pf
+							# 		if(pf > max_pf):
+							# 			max_pf = pf
+							# 			max_cut = st_cut
+							# 			tie=False
+							# 		elif (pf == max_pf) and pf>0:
+							# 			tie=True
+							# print str(i), 'max_cut', max_cut, 'max_pf', max_pf
+							# print
+							# union.update(max_cut)
+							
+							# raw_input("Press any key to continue...")
+			print
 			print union
 			print "len(union) " + str(len(union))
 			print
 			print "len(G.nodes()) " + str(len(G.nodes()))
 			print
+
+			H = G.copy()
+			H.remove_nodes_from(defense_cut)
+			print 'is_reachable', is_reachable(G, AS, dest)
 			raw_input("Press any key to continue...")
 			print
+			
 
 	def node_cut_to_all(self) :
 		PATH_FILE="./" + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
 		print "PATH_FILE " + PATH_FILE
 
 		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
-		G, all_as_set, pf_dict = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None)
+		G, all_start_as, all_dest_as, pf_dict = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, None)
 		union = set()
 
 		# Using Start in All to All case does not make much sense.
 		if self.USING_START: 
-			for dest in all_as_set:
-				if dest in all_as_set:
+			for dest in all_start_as:
+				if dest in all_start_as:
 					print START, dest
 					st_cut = minimum_st_node_cut(G, START, dest, auxiliary=H, residual=R)
 					len_st_cut = len(st_cut)
@@ -173,15 +239,16 @@ class NodeCutDirected :
 
 		else:
 			print
-			print "len(all_as_set) " + str(len(all_as_set))
+			print "len(all_start_as) " + str(len(all_start_as))
+			print "len(all_dest_as) " + str(len(all_dest_as))
 			print
 			count = 0
 
-			for i, AS in enumerate(all_as_set):
-				for dest in all_as_set:
+			for i, AS in enumerate(all_start_as):
+				for dest in all_dest_as:
 					if not dest == AS:
-
-
+						
+						# Donot delete these test values for IL all.
 						# AS = '5580'
 						# dest = '12400'
 						# AS = '5580'
@@ -190,40 +257,68 @@ class NodeCutDirected :
 						# dest = '2914'
 						# AS = '12400'
 						# dest = '174'
-						print 'AS:', AS, ' dest:', dest
 
-						max_pf = float('-inf')
-						max_cut=()
-						st_cuts, single_st_cut, max_possible_combinations = multiple_minimum_st_node_cut(G, AS, dest)
-						print 'len(st_cuts)', len(st_cuts)
-						print 'single_st_cut', single_st_cut
-						if not max_possible_combinations == None and max_possible_combinations > min_cut_constants.MAXIMUM_POSSIBLE_COMBINATIONS_DIRECTED:
-							st_cuts = []
-							st_cuts.append(single_st_cut)
-						elif len(st_cuts) > min_cut_constants.MAXIMUM_ALLOWED_ST_CUTS_COMBINATIONS_DIRECTED:
-							st_cuts = []
-							st_cuts.append(single_st_cut)
+						# test S n T for unequal cardinality for st-cut by both method. IL country all
+						# AS = '200742'
+						# dest = '35435'
 
-						for st_cut in st_cuts:
-							H = G.copy()
-							H.remove_nodes_from(st_cut)
-							if not is_reachable(H, AS, dest):
-								pf = 0
-								for cut_node in st_cut:
-									pf = pf + pf_dict[cut_node]
-								# print 'st_cut', st_cut,'pf', pf
-								if(pf > max_pf):
-									max_pf = pf
-									max_cut = st_cut
-									tie=False
-								elif (pf == max_pf) and pf>0:
-									tie=True
-						print str(i), 'max_cut', max_cut, 'max_pf', max_pf
-						print
-						union.update(max_cut)
-					else:
-						print "warning: graph does not have node : " + dest
+						# test SnT for edge in R and not in G. Issue was iteration over R edges not G edges
+						# AS = '9071'
+						# dest = '20841'
+						print i, 'AS', AS, 'dest', dest
+						defense_cut = defense_st_cut(G, AS, dest, min_cut_constants.HEURISTIC.PATH_FREQUENCY)
+						print '* defense_cut', defense_cut
+						print '*'*50
+						union.update(defense_cut)
+						# tot_weight = 0
+						# for node in defense_cut:
+						# 	print node, 'pf ',G.node[node]['path_frequency']
+						# 	tot_weight = tot_weight+G.node[node][min_cut_constants.HEURISTIC_WEIGHT]
+						# print tot_weight
+
+
+
+						# from heuristic_min_st_node_cut_impl import set_heuristic_weight
+						# set_heuristic_weight(G, [min_cut_constants.PATH_FREQUENCY])
+
+						# max_pf = float('-inf')
+						# max_cut=()
+						# st_cuts, single_st_cut, max_possible_combinations = multiple_minimum_st_node_cut(G, AS, dest)
 						
+						# if not max_possible_combinations == None and max_possible_combinations > min_cut_constants.MAXIMUM_POSSIBLE_COMBINATIONS_DIRECTED:
+						# 	st_cuts = []
+						# 	st_cuts.append(single_st_cut)
+						# elif len(st_cuts) > min_cut_constants.MAXIMUM_ALLOWED_ST_CUTS_COMBINATIONS_DIRECTED:
+						# 	st_cuts = []
+						# 	st_cuts.append(single_st_cut)
+		
+
+						# for st_cut in st_cuts:
+						# 	H = G.copy()
+						# 	H.remove_nodes_from(st_cut)
+
+						# 	if not is_reachable(H, AS, dest):
+						# 		pf = 0
+						# 		for cut_node in st_cut:
+						# 			pf = pf + pf_dict[cut_node]
+						# 		print 'possible', st_cut,'pf', pf
+						# 		if(pf > max_pf):
+						# 			max_pf = pf
+						# 			max_cut = st_cut
+						# 			tie=False
+						# 		elif (pf == max_pf) and pf>0:
+						# 			tie=True
+						
+						# union.update(max_cut)
+						# print '* max_cut', max_cut
+						# tot_weight = 0
+						# for node in max_cut:
+						# 	print node, G.node[node]['path_frequency']
+						# 	tot_weight = tot_weight + (1/G.node[node]['path_frequency'])
+						# print tot_weight
+						# raw_input("Press any key to continue..............................................................")
+						# print
+					
 
 		print union
 		print "len(union) " + str(len(union))
@@ -270,23 +365,6 @@ if __name__ == "__main__":
 
 	#Create our class object
 	NC = NodeCutDirected(COUNTRY_CODE, MODE, using_start)
-
-	if MODE == "2":
-		'''
-		Input from user the important locations to which to draw graph to
-		'''
-		print "domains " + str(NC.DOMAINS)
-		print "options " + str(range(1, len(NC.DOMAINS) + 1))
-		selected_imp_str = raw_input("Enter choice (space separated for multiple) ")
-		selected_domains = selected_imp_str.split()
-		if len(selected_domains) > len(NC.DOMAINS):
-			print "length greater than domains"
-			exit()
-		for selected_imp in selected_domains:
-			if not selected_imp.isdigit() or (int(selected_imp) - 1) > (len(NC.DOMAINS) - 1):
-				print "invalid selected_imp " + selected_imp
-				exit()
-		NC.selected_domains = selected_domains
 
 	# Call node cut implementation
 	if MODE == "2":
