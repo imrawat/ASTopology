@@ -43,7 +43,7 @@ if __name__ == "__main__":
 	as_list = constants.TEST_DATA + COUNTRY_CODE+'_AS.txt'
 
 	#16bit mapped AS list
-	CAIDA_REL_16BIT = constants.TEST_DATA + 'caida_16bit.txt'
+	CAIDA_REL_16BIT = 'caida_16bit.txt'
 
 	#AS to its 16bit alias mapping.
 	AS_TO_16BIT_MAPPING = constants.TEST_DATA + 'cbgp_AS216bit_caida_map.txt'	

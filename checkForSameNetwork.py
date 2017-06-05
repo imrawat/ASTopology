@@ -1,7 +1,9 @@
-INFILE = "CN_transport.txt"
+import constants
+
+INFILE = constants.TEST_DATA + "IN_ASPrefixes.txt"
 # AS35553 192.115.240.0/22
 
-IS_IMP_AS = True
+IS_IMP_AS = False
 print "IS_IMP_AS " + str(IS_IMP_AS)
 print
 
