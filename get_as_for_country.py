@@ -6,9 +6,10 @@ from http://bgp.he.net
 import urllib2
 import operator
 import requests
+import constants
 from bs4 import BeautifulSoup
 
-COUNTRY_CODE='PK'
+COUNTRY_CODE='IL'
 url = "http://bgp.he.net/country/" + COUNTRY_CODE
 hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -16,7 +17,7 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
        'Accept-Encoding': 'none',
        'Accept-Language': 'en-US,en;q=0.8',
        'Connection': 'keep-alive'}
-out_file='./'+COUNTRY_CODE+'_AS.txt'
+out_file = constants.TEST_DATA + COUNTRY_CODE + '_AS.txt'
 
 req = urllib2.Request(url, headers=hdr)
 

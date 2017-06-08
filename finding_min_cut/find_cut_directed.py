@@ -24,6 +24,7 @@ from networkx.algorithms.connectivity import (build_auxiliary_node_connectivity)
 from networkx.algorithms.flow import build_residual_network
 
 # Local imports
+import constants
 import min_cut_constants
 from min_cut_utility import BFS
 from min_cut_utility import print_path_if_reachable
@@ -65,7 +66,7 @@ class NodeCutDirected :
 		'''Constants
 		'''
 		# 16bit AS to AS mapping
-		self.BIT16_TO_AS_MAPPING='./cbgp_16bit2AS_caida_map.txt'
+		self.BIT16_TO_AS_MAPPING = constants.TEST_DATA + 'cbgp_16bit2AS_caida_map.txt'
 		
 		self.DOMAINS = ['bank', 'govt', 'transport']
 		
@@ -104,12 +105,12 @@ class NodeCutDirected :
 			self.selected_domains.append(selected_imp)
 
 			domain = self.DOMAINS[int(selected_imp) - 1]
-			domain_file = './'+self.COUNTRY_CODE+'_'+domain+'.txt'
+			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + '_' + domain + '.txt'
 
 			# donot use. use all_dest_as instead from actual paths
 			# self.add_dest_as(domain_file, dest_as_list) 
 
-			PATH_FILE="./"+self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
+			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
 			print "PATH_FILE " + PATH_FILE
 			
 			mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
@@ -212,7 +213,7 @@ class NodeCutDirected :
 			
 
 	def node_cut_to_all(self) :
-		PATH_FILE="./" + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
+		PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
 		print "PATH_FILE " + PATH_FILE
 
 		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
@@ -328,7 +329,8 @@ class NodeCutDirected :
 		print
 
 	def get_mapping_dict(self, BIT16_TO_AS_MAPPING) :
-		"""Save 16bit to AS mapping in a dict."""
+		"""Save 16bit to AS mapping in a dict.
+		"""
 		mapping_dict=dict()
 		if self.IS_CBGP:
 			with open(BIT16_TO_AS_MAPPING) as fi:

@@ -30,6 +30,7 @@ if __name__ == "__main__":
 
 	if START_LINE_NUMBER == None:
 		MODE = 'w'
+		START_LINE_NUMBER = 1
 	else:
 		MODE = 'a'
 	
@@ -49,6 +50,10 @@ if __name__ == "__main__":
 
 	DATA_SOURCE = CIDR_REPORT
 	# DATA_SOURCE = BGP_HE_NET
+
+	if DATA_SOURCE == BGP_HE_NET:
+		from selenium import webdriver
+		browser = webdriver.Chrome('/Users/Madhur/github/ASTopology/chromedriver')
 	
 	for i, line in enumerate(fi):
 		curr_line = 0
@@ -85,10 +90,6 @@ if __name__ == "__main__":
 					break
 			time.sleep(8)
 		elif DATA_SOURCE == BGP_HE_NET:
-
-			from selenium import webdriver
-
-			browser = webdriver.Chrome('/Users/Madhur/github/ASTopology/chromedriver')
 			url = "http://bgp.he.net/" + AS + "#_prefixes"
 			print
 			print str(i + 1)+'. Fetch : '+url
