@@ -47,8 +47,9 @@ from heuristic_min_st_node_cut_impl import defense_st_cut
 
 class NodeCutDirected :
 
-	def __init__(self,country_code, mode, using_start) :
+	def __init__(self,country_code, mode, using_start, heuristic) :
 		self.COUNTRY_CODE = country_code
+		self.HEURISTIC = heuristic
 		if mode == "1":
 			self.MODE_SUFFIX = "_country_all"
 		elif mode == "2":
@@ -166,7 +167,7 @@ class NodeCutDirected :
 
 							PATH_FREQUENCY = 'path_frequency'
 							'''
-							defense_cut = defense_st_cut(G, AS, dest, min_cut_constants.HEURISTIC.PATH_FREQUENCY)
+							defense_cut = defense_st_cut(G, AS, dest, self.HEURISTIC)
 							print '* defense_cut', defense_cut
 							print '*'*50
 							union.update(defense_cut)
@@ -276,7 +277,7 @@ class NodeCutDirected :
 						# AS = '9071'
 						# dest = '20841'
 						print i, 'AS', AS, 'dest', dest
-						defense_cut = defense_st_cut(G, AS, dest, min_cut_constants.HEURISTIC.CUSTOMER_DEGREE)
+						defense_cut = defense_st_cut(G, AS, dest, self.HEURISTIC)
 						print '* defense_cut', defense_cut
 						print '*'*50
 						union.update(defense_cut)
@@ -366,16 +367,28 @@ class NodeCutDirected :
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description = 'find cut for defender in directed graph')
 	parser.add_argument('-c', '--country_code', help='Find Cut Directed', required = True)
-	parser.add_argument('-m', '--mode', help='CENSYS Search', required = True)
-	parser.add_argument('-s', '--using_start', help='CENSYS Search', required = True)
+	parser.add_argument('-m', '--mode', help='Find Cut Directed', required = True)
+	parser.add_argument('-s', '--using_start', help='Find Cut Directed', required = True)
+	parser.add_argument('-H', '--heuristic', help='Find Cut Directed', required = False)
+
+	# CUSTOMER_DEGREE = 1
+	# PROVIDER_DEGREE = 2
+	# PEER_DEGREE = 3
+	# CUSTOMER_CONE_SIZE = 4
+	# ALPHA_CENTRALITY = 5
+	# BETWEENNESS_CENTRALITY = 6
+	# PATH_FREQUENCY = 7
 	
 	args = parser.parse_args()
 	COUNTRY_CODE = args.country_code
 	MODE = args.mode
 	using_start = args.using_start
+	heuristic = args.heuristic
+	if not heuristic == None:
+		heuristic = int(heuristic)
 
 	#Create our class object
-	NC = NodeCutDirected(COUNTRY_CODE, MODE, using_start)
+	NC = NodeCutDirected(COUNTRY_CODE, MODE, using_start, heuristic)
 
 	# Call node cut implementation
 	if MODE == "2":

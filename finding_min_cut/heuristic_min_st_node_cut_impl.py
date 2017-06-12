@@ -53,6 +53,8 @@ def node_characteristic_list_for_heuristic(heuristic):
 
 def defense_st_cut(G, source, sink, heuristic = None):
 
+	if heuristic == None:
+		heuristic = min_cut_constants.HEURISTIC.PATH_FREQUENCY
 	node_characteristics_list = node_characteristic_list_for_heuristic(heuristic)
 	
 	set_heuristic_weight(G, node_characteristics_list)
