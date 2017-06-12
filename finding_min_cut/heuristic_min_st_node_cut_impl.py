@@ -36,6 +36,19 @@ def set_heuristic_weight(G, node_characteristics_list):
 def node_characteristic_list_for_heuristic(heuristic):
 	if heuristic == min_cut_constants.HEURISTIC.PATH_FREQUENCY:
 		return [min_cut_constants.PATH_FREQUENCY]
+	elif heuristic == min_cut_constants.HEURISTIC.CUSTOMER_DEGREE:
+		return [min_cut_constants.CUSTOMER_DEGREE]
+	elif heuristic == min_cut_constants.HEURISTIC.PROVIDER_DEGREE:
+		return [min_cut_constants.PROVIDER_DEGREE]
+	elif heuristic == min_cut_constants.HEURISTIC.PEER_DEGREE:
+		return [min_cut_constants.PEER_DEGREE]
+	elif heuristic == min_cut_constants.HEURISTIC.CUSTOMER_CONE_SIZE:
+		return [min_cut_constants.CUSTOMER_CONE_SIZE]
+	elif heuristic == min_cut_constants.HEURISTIC.ALPHA_CENTRALITY:
+		return [min_cut_constants.ALPHA_CENTRALITY]
+	elif heuristic == min_cut_constants.HEURISTIC.BETWEENNESS_CENTRALITY:
+		return [min_cut_constants.BETWEENNESS_CENTRALITY]
+
 
 
 def defense_st_cut(G, source, sink, heuristic = None):

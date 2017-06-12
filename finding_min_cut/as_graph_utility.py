@@ -8,16 +8,17 @@ import networkx as nx
 
 #local imports
 import min_cut_constants
+import constants
 
 
-''' For directed graphs
+def auxiliary_graph(G):
+	''' For directed graphs
 	Returns an auxiliary_graph for use to find node cut set from edge cut set
 	References
 	----------
 	Abdol-Hossein Esfahanian. Connectivity Algorithms.
 		http://www.cse.msu.edu/~cse835/Papers/Graph_connectivity_revised.pdf
-'''
-def auxiliary_graph(G):
+	'''
 	if not G.is_directed():
 		print 'Only directed graphs supported currently'
 		exit()
@@ -39,7 +40,6 @@ def auxiliary_graph(G):
 		H.edge['%sB' % source]['%sA' % target][min_cut_constants.HEURISTIC_WEIGHT] = float('inf')
 
 	return H
-
 
 def as_graph_undirected(path_file, IS_CBGP, mapping_dict):
 
@@ -89,7 +89,6 @@ def as_graph_undirected(path_file, IS_CBGP, mapping_dict):
 		G.node[node][min_cut_constants.PATH_FREQUENCY] = pf_dict[node]
 
 	return (G)
-
 
 def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = None, G = None, pf_dict = None) :
 	# All AS from which traceroute is done. Should have most AS from IL_AS.txt file
@@ -179,8 +178,37 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 					
 					print splits
 
+	betweenness_centrality_dict = nx.betweenness_centrality(G)
+
+	(customers, providers, peers) = compute_degrees()
+
+	customer_conesize = get_customer_conesize()
+
 	for node in G.nodes():
 		G.node[node][min_cut_constants.PATH_FREQUENCY] = 0
+
+		G.node[node][min_cut_constants.BETWEENNESS_CENTRALITY] = betweenness_centrality_dict[node]
+
+		if node in customers:
+			G.node[node][min_cut_constants.CUSTOMER_DEGREE] = len(customers[node])
+		else:
+			G.node[node][min_cut_constants.CUSTOMER_DEGREE] = 0
+
+		if node in providers:
+			G.node[node][min_cut_constants.PROVIDER_DEGREE] = len(providers[node])
+		else:
+			G.node[node][min_cut_constants.PROVIDER_DEGREE] = 0
+
+		if node in peers:
+			G.node[node][min_cut_constants.PEER_DEGREE] = len(peers[node])
+		else:
+			G.node[node][min_cut_constants.PEER_DEGREE] = 0
+
+		if node in customer_conesize:
+			G.node[node][min_cut_constants.CUSTOMER_CONE_SIZE] = customer_conesize[node]
+		else:
+			G.node[node][min_cut_constants.CUSTOMER_CONE_SIZE] = 0
+
 	for node in pf_dict:
 		G.node[node][min_cut_constants.PATH_FREQUENCY] = pf_dict[node]
 
@@ -202,6 +230,59 @@ def is_reachable(G, s, d):
 		            queue.append(i)
 		            visited[i] = True
 		return False
+
+def get_customer_conesize():
+	CONESIZE = constants.TEST_DATA + "customer_conesize.txt"
+	fi = open(CONESIZE)
+	conesizes = dict()
+	for line in fi:
+		line = line.strip()
+		splits = line.split()
+		AS = splits[0]
+		conesize = splits[1]
+		if not AS in conesizes:
+			conesizes[AS] = int(conesize)
+
+	return conesizes
+
+def compute_degrees():
+	CAIDAREL = constants.TEST_DATA + "caidarel.txt"
+	fi = open(CAIDAREL)
+	customers = {}
+	providers = {}
+	peers = {}
+	for line in fi:
+		line = line.strip()
+		splits = line.split()
+		provider = splits[0]
+		customer = splits[1]
+		rel = splits[2]
+
+		if rel == "1":
+			if not provider in customers:
+				customers[provider] = {customer}
+			else:
+				customers[provider].add(customer)
+			if not customer in providers:
+				providers[customer] = {provider}
+			else:
+				providers[customer].add(provider)
+		elif rel == "0":
+			if not provider in peers:
+				peers[provider] = {customer}
+			else:
+				peers[provider].add(customer)
+			if not customer in peers:
+				peers[customer] = {provider}
+			else:
+				peers[customer].add(provider)
+
+		else:
+			
+			print "Invalid caidarel file"
+			exit()
+	return (customers, providers, peers)
+
 
 def paths_between_st_util(G, u, d, visited, path):
 	visited[u]= True
@@ -228,17 +309,18 @@ def paths_between_st(G ,source, sink):
 if __name__ == "__main__":
 
 	# Test auxiliary graph
-	G = nx.DiGraph()
-	G.add_nodes_from((4,5,6))
-	G.node[4][min_cut_constants.HEURISTIC_WEIGHT] = 100
-	G.node[5][min_cut_constants.HEURISTIC_WEIGHT] = 500
-	G.node[6][min_cut_constants.HEURISTIC_WEIGHT] = 900
-	G.add_edge(4,5)
-	G.add_edge(5,6)
+	# G = nx.DiGraph()
+	# G.add_nodes_from((4,5,6))
+	# G.node[4][min_cut_constants.HEURISTIC_WEIGHT] = 100
+	# G.node[5][min_cut_constants.HEURISTIC_WEIGHT] = 500
+	# G.node[6][min_cut_constants.HEURISTIC_WEIGHT] = 900
+	# G.add_edge(4,5)
+	# G.add_edge(5,6)
 
-	H = auxiliary_graph(G)
-	for (s,t) in H.edges_iter():
-		print s, t, type(H.edge[s][t])
+	# H = auxiliary_graph(G)
+	# for (s,t) in H.edges_iter():
+	# 	print s, t, type(H.edge[s][t])
+	compute_degrees()
 
 	
 

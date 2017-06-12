@@ -100,19 +100,19 @@ def zero_capacity_paths_from_residual(G, source, sink):
 
 
 if __name__ == "__main__":
-    source = 0; sink = 5
+	source = 0; sink = 5
 
-    G = nx.DiGraph()
-    G.add_nodes_from([0, 1, 2, 3, 4, 5])
-    G.add_edge(0, 1, capacity = 1)
-    G.add_edge(0, 2, capacity = 1)
-    G.add_edge(1, 3, capacity = 1)
-    G.add_edge(1, 2, capacity = 1)
-    G.add_edge(2, 1, capacity = 1)
-    G.add_edge(2, 4, capacity = 1)
-    G.add_edge(3, 2, capacity = 1)
-    G.add_edge(3, 5, capacity = 1)
-    G.add_edge(4, 3, capacity = 1)
-    G.add_edge(4, 5, capacity = 1)
+	G = nx.DiGraph()
+	G.add_nodes_from([0, 1, 2, 3, 4, 5])
+	G.add_edge(0, 1, capacity = 1)
+	G.add_edge(0, 2, capacity = 1)
+	G.add_edge(1, 3, capacity = 1)
+	G.add_edge(1, 2, capacity = 1)
+	G.add_edge(2, 1, capacity = 1)
+	G.add_edge(2, 4, capacity = 1)
+	G.add_edge(3, 2, capacity = 1)
+	G.add_edge(3, 5, capacity = 1)
+	G.add_edge(4, 3, capacity = 1)
+	G.add_edge(4, 5, capacity = 1)
 
 # print multiple_minimum_st_node_cut(G, source, sink)

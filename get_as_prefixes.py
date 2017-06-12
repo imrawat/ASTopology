@@ -67,7 +67,7 @@ if __name__ == "__main__":
 			url = 'http://www.cidr-report.org/cgi-bin/as-report?as='+AS+'&view=2.0'
 			print
 			print str(i + 1)+'. Fetch : '+url
-			req = urllib2.Request(url, headers=hdr)
+			req = urllib2.Request(url)
 			try:
 			    page = urllib2.urlopen(req)
 			except urllib2.HTTPError, e:

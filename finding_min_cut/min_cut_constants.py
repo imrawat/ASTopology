@@ -10,6 +10,13 @@ MAXIMUM_ALLOWED_ST_CUTS_COMBINATIONS_DIRECTED = 1000
 '''
 Node characteristic that can be used in heuristic weight
 '''
+CUSTOMER_DEGREE = 'customer_degree'
+PROVIDER_DEGREE = 'provider_degree'
+PEER_DEGREE = 'peer_degree'
+CUSTOMER_CONE_SIZE = 'customer_cone_size'
+ALPHA_CENTRALITY = 'alpha_centrality'
+BETWEENNESS_CENTRALITY = 'betweenness_centrality'
+
 PATH_FREQUENCY = 'path_frequency'
 CAPACITY = 'capacity'
 HEURISTIC_WEIGHT = 'heuristic_weight'
@@ -20,7 +27,14 @@ HEURISTIC_WEIGHT = 'heuristic_weight'
 Various heuristic of node characteristic combinations that can be applied
 '''
 class HEURISTIC:
-	PATH_FREQUENCY = range(1)
+	CUSTOMER_DEGREE = 1
+	PROVIDER_DEGREE = 2
+	PEER_DEGREE = 3
+	CUSTOMER_CONE_SIZE = 4
+	ALPHA_CENTRALITY = 5
+	BETWEENNESS_CENTRALITY = 6
+	PATH_FREQUENCY = 7
+
 
 
 
