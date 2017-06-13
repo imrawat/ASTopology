@@ -77,8 +77,6 @@ class NodeCutDirected :
 
 
 	def node_cut_to_important(self) :
-		
-
 		union = set()
 
 		# Every time a new domain is added we will add the paths for it to already created graph
@@ -109,9 +107,12 @@ class NodeCutDirected :
 			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + '_' + domain + '.txt'
 
 			# donot use. use all_dest_as instead from actual paths
-			# self.add_dest_as(domain_file, dest_as_list) 
+			dest_as_list = []
+			self.add_dest_as(domain_file, dest_as_list)
+			print 'dest_as_list', dest_as_list 
 
 			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
+			# PATH_FILE = constants.TEST_DATA + "IL_gao_cbgp_paths_country_all.txt"
 			print "PATH_FILE " + PATH_FILE
 			
 			mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
@@ -154,19 +155,10 @@ class NodeCutDirected :
 				print
 				for i, AS in enumerate(all_start_as):
 					for dest in all_dest_as:
-						if not AS == dest:
+						if not AS == dest :#and dest in dest_as_list:
 
 							print i, 'AS', AS, 'dest', dest
-							'''
-							CUSTOMER_DEGREE = 'customer_degree'
-							PROVIDER_DEGREE = 'provider_degree'
-							PEER_DEGREE = 'peer_degree'
-							CUSTOMER_CONE_SIZE = 'customer_cone_size'
-							ALPHA_CENTRALITY = 'alpha_centrality'
-							BETWEENNESS_CENTRALITY = 'betweenness_centrality'
-
-							PATH_FREQUENCY = 'path_frequency'
-							'''
+						
 							defense_cut = defense_st_cut(G, AS, dest, self.HEURISTIC)
 							print '* defense_cut', defense_cut
 							print '*'*50
@@ -276,11 +268,15 @@ class NodeCutDirected :
 						# test SnT for edge in R and not in G. Issue was iteration over R edges not G edges
 						# AS = '9071'
 						# dest = '20841'
+
+						# AS = '9116'
+						# dest = '44282'
 						print i, 'AS', AS, 'dest', dest
 						defense_cut = defense_st_cut(G, AS, dest, self.HEURISTIC)
 						print '* defense_cut', defense_cut
 						print '*'*50
 						union.update(defense_cut)
+						# exit()
 						# tot_weight = 0
 						# for node in defense_cut:
 						# 	print node, 'pf ',G.node[node]['path_frequency']

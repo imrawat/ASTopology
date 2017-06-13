@@ -11,7 +11,6 @@ import math
 import min_cut_constants
 from as_graph_utility import is_reachable
 from min_cut_utility import BFS
-from min_cut_utility import print_path_if_reachable
 from as_graph_utility import auxiliary_graph
 from minimum_st_edge_cut import min_st_edge_cut
 
@@ -25,11 +24,13 @@ def set_heuristic_weight(G, node_characteristics_list):
 	for node in G.nodes():
 		heuristic_weight = 0
 		for node_characteristic in node_characteristics_list:
+			
 			heuristic_weight = heuristic_weight + G.node[node][node_characteristic]
 		if heuristic_weight > 0:
 			G.node[node][min_cut_constants.HEURISTIC_WEIGHT] = 1/heuristic_weight
 		else: 
 			G.node[node][min_cut_constants.HEURISTIC_WEIGHT] = 0.0
+
 
 ''' Returs a list of node_characteristics for the given heuristic
 '''
@@ -52,7 +53,10 @@ def node_characteristic_list_for_heuristic(heuristic):
 
 
 def defense_st_cut(G, source, sink, heuristic = None):
-
+	
+	AS = source
+	dest = sink
+	
 	if heuristic == None:
 		heuristic = min_cut_constants.HEURISTIC.PATH_FREQUENCY
 	node_characteristics_list = node_characteristic_list_for_heuristic(heuristic)
@@ -60,16 +64,20 @@ def defense_st_cut(G, source, sink, heuristic = None):
 	set_heuristic_weight(G, node_characteristics_list)
 
 	A = auxiliary_graph(G)
-
+	AC = A.copy()
 	R, st_edge_cut = min_st_edge_cut(A, '%sB' % source, '%sA' % sink)
 
 	st_node_cut = set()
 
-	for (source, sink) in st_edge_cut:
-		AS_source = source[:-1]
-		AS_sink = sink[:-1]
-		# print st_edge_cut
+	temp = set()
+	for (u, v) in st_edge_cut:
+		AS_source = u[:-1]
+		AS_sink = v[:-1]
+
+		
 		if AS_source == AS_sink:
+			temp.add(u)
+			temp.add(v)
 			st_node_cut.add(AS_source)
 		else:
 			print "Warning. AS_source not equal to AS_sink. Non auxiliary edge cannot be in cut"
@@ -78,18 +86,7 @@ def defense_st_cut(G, source, sink, heuristic = None):
 
 	return st_node_cut
 
-
-
-
-
-
-
-
-
-
-
-
-
+	#AS 9116 dest 44282
 
 
 

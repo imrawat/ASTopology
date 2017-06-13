@@ -19,7 +19,7 @@ DFS on edges with valid weight
 def DFS(G, s, visited):
     visited[s] = True
     for v in G.neighbors(s):
-        if G.edge[s][v][min_cut_constants.HEURISTIC_WEIGHT] > 0  and visited[v] == False:
+        if G.edge[s][v][min_cut_constants.HEURISTIC_WEIGHT] > 0.0  and visited[v] == False:
             DFS(G, v, visited)
 
 '''
@@ -80,7 +80,7 @@ def min_st_edge_cut(G, source, sink):
     parent = dict()
     for v in G.nodes():
         parent[v] = -1
-    max_flow = 0 
+    max_flow = 0.0
     
     while BFS(R, source, sink, parent) :
         path_flow = float("Inf")
@@ -97,17 +97,19 @@ def min_st_edge_cut(G, source, sink):
             R.edge[u][v][min_cut_constants.HEURISTIC_WEIGHT] = R.edge[u][v][min_cut_constants.HEURISTIC_WEIGHT] - path_flow
             if not R.has_edge(v, u):
                 R.add_edge(v, u)
-                R.edge[v][u][min_cut_constants.HEURISTIC_WEIGHT] = 0
+                R.edge[v][u][min_cut_constants.HEURISTIC_WEIGHT] = 0.0
             R.edge[v][u][min_cut_constants.HEURISTIC_WEIGHT] = R.edge[v][u][min_cut_constants.HEURISTIC_WEIGHT] + path_flow
             v = parent[v]
 
     # Find nodes which can be visited
     visited = initVisited(G)
     DFS(R, source, visited)
+    
     single_st_edge_cut = []
     for i in G.nodes():
         for j in G.neighbors(i):
-            if visited[i] and not visited[j] and G.edge[i][j][min_cut_constants.HEURISTIC_WEIGHT] > 0:
+            if visited[i] and not visited[j] and G.edge[i][j][min_cut_constants.HEURISTIC_WEIGHT] > 0.0:
+                
                 single_st_edge_cut.append((i, j))
 
     return R, single_st_edge_cut

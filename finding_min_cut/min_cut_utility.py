@@ -8,11 +8,25 @@ import min_cut_constants
 
 ''' Find if reachable and prints the path through which sink is reachable
 '''
+def print_path_if_reachable_capacity(G, source, sink):
+    parent = dict()
+    for v in G.nodes():
+        parent[v] = -1
+    if BFS_capacity(G, source, sink, parent):
+        s = sink
+        t = []
+        t.append(s)
+        while(s !=  source):
+            s = parent[s]
+            t.append(s)
+        print 'path even after cut', list(reversed(t))
+        return True
+    else:
+        return False
 def print_path_if_reachable(G, source, sink):
     parent = dict()
     for v in G.nodes():
         parent[v] = -1
-
     if BFS(G, source, sink, parent):
         s = sink
         t = []
@@ -21,6 +35,9 @@ def print_path_if_reachable(G, source, sink):
             s = parent[s]
             t.append(s)
         print 'path even after cut', list(reversed(t))
+        return True
+    else:
+        return False
 
 ''' Similar to print_path_if_reachable this checks if sink is reachable and stores path in parent
 '''
@@ -32,7 +49,6 @@ def BFS(G, s, t, parent):
     while queue:
         u = queue.pop(0)
         for v in G.neighbors(u):
-
             if visited[v] == False and G.edge[u][v][min_cut_constants.HEURISTIC_WEIGHT] > 0 :
                 queue.append(v)
                 visited[v] = True
