@@ -108,7 +108,7 @@ if __name__ == "__main__":
 				prefix = splits[1]
 
 				if not num in mapping_dict:
-					print num+' not in caida'
+					print num+' prefix AS not in caida'
 					continue
 				if not prefix in prefix_set:
 					prefix_set.add(prefix)
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 				# add to mapped 16bit AS instead of actual AS numbers
 				AS_16bit='AS'+mapping_dict[num]
 				com = 'bgp router '+AS_16bit+' add network '+prefix
-				print com
+				# print com
 				fo.write(com+'\n')
 				fo.write('time save\n')
 				fo.write('sim run\n')
@@ -133,12 +133,12 @@ if __name__ == "__main__":
 				ll=line[:len(line)-1]
 				num=ll[2:]
 				if not num in mapping_dict:
-					print num+' not in caida'
+					print num+' AS not in caida'
 					continue
 				AS_16bit='AS'+mapping_dict[num]
 				for prefix in prefix_set:
 					com = 'bgp router '+AS_16bit+' record-route '+prefix
-					print com
+					# print com
 					fo.write(com+'\n') 		
 
 

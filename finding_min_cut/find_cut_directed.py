@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+	# !/usr/bin/env python
 # Name :  Madhur Rawat
 # Organization: IIIT Delhi
 # Date : 15/12/16
@@ -34,6 +34,7 @@ from as_graph_utility import paths_between_st
 from minimum_st_node_cut import multiple_minimum_st_node_cut
 from minimum_st_node_cut import zero_capacity_residual_paths
 from heuristic_min_st_node_cut_impl import defense_st_cut
+from heuristic_min_st_node_cut_impl import defense_cut_non_induced
 
 
 '''
@@ -69,7 +70,7 @@ class NodeCutDirected :
 		# 16bit AS to AS mapping
 		self.BIT16_TO_AS_MAPPING = constants.TEST_DATA + 'cbgp_16bit2AS_caida_map.txt'
 		
-		self.DOMAINS = ['bank', 'govt', 'transport']
+		self.DOMAINS = constants.DOMAINS
 		
 		# Indicates that path were received from CBGP and therefore 16bit mapping was done possibly.
 		self.IS_CBGP=True
@@ -77,6 +78,7 @@ class NodeCutDirected :
 
 
 	def node_cut_to_important(self) :
+		START = 'start'
 		union = set()
 
 		# Every time a new domain is added we will add the paths for it to already created graph
@@ -109,61 +111,64 @@ class NodeCutDirected :
 			# donot use. use all_dest_as instead from actual paths
 			dest_as_list = []
 			self.add_dest_as(domain_file, dest_as_list)
-			print 'dest_as_list', dest_as_list 
 
 			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
 			# PATH_FILE = constants.TEST_DATA + "IL_gao_cbgp_paths_country_all.txt"
 			print "PATH_FILE " + PATH_FILE
 			
 			mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
-			
-			(G, all_start_as, all_dest_as, pf_dict) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, G, pf_dict)
-			print 'pf_dict', pf_dict
-			# Remove nodes with low neighbour count
-			# Donot remove if its destination node. 
-			# TODO: Check if this is required.
-			# for node in G.nodes():
-			# 	if not node in all_dest_as and len(G.in_edges(node)) < 2:
-			# 		all_neighbor_victims = True
-			# 		for neighbor in G.neighbors(node):
-			# 			if not neighbor in all_dest_as:
-			# 				all_neighbor_victims = False
-			# 				break
-			# 		if all_neighbor_victims:
-			# 			G.remove_node(node)
-			# 			all_as_set.remove(node)
-
 
 			if self.USING_START:
-				for dest in dest_as_list:
-					if dest in all_as_set:
-						st_cuts, single_st_cut = multiple_minimum_st_node_cut(G, START, dest)
-						len_st_cut = len(st_cut)
-						print st_cut
-						print len_st_cut
-						print
-						if len_st_cut <= 200:
-							union.update(st_cut)
-						else:
-							union.add(dest)
-					else:
-						print "warning: graph does not have node : " + dest
+				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, dest_as_list, G, pf_dict)
+				for dest in all_dest_as:
+					print 'START', START, 'dest', dest
+					defense_cut = defense_st_cut(G, START, dest, self.HEURISTIC)
+					print '* defense_cut', defense_cut
+					print '*'*50
+					union.update(defense_cut)
+				print
+				print union
+				print "len(union) " + str(len(union))
+				print
+				print "len(G.nodes()) " + str(len(G.nodes()))
+				print
+
+				H = G.copy()
+				H.remove_nodes_from(defense_cut)
+				print 'is_reachable', is_reachable(G, START, dest)
+				raw_input("Press any key to continue...")
+				print
+
 			else:
+				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, G, pf_dict)
+
+				# predecessors = set()
+				# for dest in all_dest_as:
+				# 	for predecessor in G.predecessors(dest):
+				# 		predecessors.add(predecessor)
+				# print 'dest predecessors ', predecessors
+				# print 'len dest predecessors ', len(predecessors)
+				# exit()
+
 				print
 				print "len(all_start_as) " + str(len(all_start_as))
 				print "len(all_dest_as) " + str(len(all_dest_as))
 				print
 				for i, AS in enumerate(all_start_as):
 					for dest in all_dest_as:
-						if not AS == dest :#and dest in dest_as_list:
+						if not AS == dest :
+
+							# use when all to all topology is used for all to important cutset.
+							if not dest in dest_as_list:
+								continue
 
 							print i, 'AS', AS, 'dest', dest
-						
+							
 							defense_cut = defense_st_cut(G, AS, dest, self.HEURISTIC)
 							print '* defense_cut', defense_cut
 							print '*'*50
 							union.update(defense_cut)
-
+							
 
 
 							# print 'AS:', AS, ' dest:', dest
@@ -201,18 +206,58 @@ class NodeCutDirected :
 							# union.update(max_cut)
 							
 							# raw_input("Press any key to continue...")
-			print
-			print union
-			print "len(union) " + str(len(union))
-			print
-			print "len(G.nodes()) " + str(len(G.nodes()))
-			print
+				print
+				print union
+				print "len(union) " + str(len(union))
+				print
+				print "len(G.nodes()) " + str(len(G.nodes()))
+				print
 
-			H = G.copy()
-			H.remove_nodes_from(defense_cut)
-			print 'is_reachable', is_reachable(G, AS, dest)
-			raw_input("Press any key to continue...")
-			print
+				H = G.copy()
+				H.remove_nodes_from(defense_cut)
+				print 'is_reachable', is_reachable(G, AS, dest)
+				raw_input("Press any key to continue...")
+				print
+
+	def node_cut_non_induced_to_important(self):
+		done = False
+		while (done == False and (not len(self.selected_domains) == self.DOMAINS)):
+			'''
+			Input from user the important locations to which to draw graph to
+			'''
+			print "domains " + str(self.DOMAINS)
+			print "options " + str(range(1, len(self.DOMAINS) + 1))
+			selected_imp = raw_input("Enter space separated choice. Currently single choice only. 0 to EXIT? ")
+			if selected_imp == '0' or selected_imp == 0:
+				done = True
+				continue
+			
+			if not selected_imp.isdigit() or (int(selected_imp) - 1) > (len(self.DOMAINS) - 1) or selected_imp in self.selected_domains:
+				print "invalid selected_imp or already selected " + selected_imp
+				continue
+
+			self.selected_domains.append(selected_imp)
+
+			domain = self.DOMAINS[int(selected_imp) - 1]
+			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + '_' + domain + '.txt'
+
+			# donot use. use all_dest_as instead from actual paths
+			dest_as_list = []
+			self.add_dest_as(domain_file, dest_as_list)
+
+			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
+			print "PATH_FILE " + PATH_FILE
+
+			defense_cut_non_induced(PATH_FILE, self.HEURISTIC)
+
+
+	def node_cut_non_induced_to_all(self):
+		PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
+		print "PATH_FILE " + PATH_FILE
+
+		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
+		
+		defense_cut_non_induced(PATH_FILE, self.HEURISTIC)
 			
 
 	def node_cut_to_all(self) :
@@ -220,8 +265,21 @@ class NodeCutDirected :
 		print "PATH_FILE " + PATH_FILE
 
 		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
-		G, all_start_as, all_dest_as, pf_dict = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, None)
+		(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, None)
 		union = set()
+		print 'len(G.nodes())', len(G.nodes())
+		ASFILE = constants.TEST_DATA + self.COUNTRY_CODE + "_AS.txt"
+		fi = open(ASFILE)
+		asset = set()
+		print 'G.nodes()', G.nodes()
+		for line in fi:
+			line = line.strip()
+			AS = line[2:]
+			asset.add(AS)
+		for node in G.nodes():
+			if node not in asset:
+				print '$', node
+		# exit()
 
 		# Using Start in All to All case does not make much sense.
 		if self.USING_START: 
@@ -246,6 +304,14 @@ class NodeCutDirected :
 			print "len(all_dest_as) " + str(len(all_dest_as))
 			print
 			count = 0
+
+			# predecessors = set()
+			# for dest in all_dest_as:
+			# 	for predecessor in G.predecessors(dest):
+			# 		predecessors.add(predecessor)
+			# print 'dest predecessors ', predecessors
+			# print 'len dest predecessors ', len(predecessors)
+			# exit()
 
 			for i, AS in enumerate(all_start_as):
 				for dest in all_dest_as:
@@ -276,7 +342,7 @@ class NodeCutDirected :
 						print '* defense_cut', defense_cut
 						print '*'*50
 						union.update(defense_cut)
-						# exit()
+						
 						# tot_weight = 0
 						# for node in defense_cut:
 						# 	print node, 'pf ',G.node[node]['path_frequency']
@@ -356,7 +422,7 @@ class NodeCutDirected :
 					splits = ll.split(' ')
 					if not splits[2] in dest_as_list:
 						dest_as_list.append(splits[2])
-		print "dest_as_list " + str(dest_as_list)
+		
 		print
 
 
@@ -366,6 +432,13 @@ if __name__ == "__main__":
 	parser.add_argument('-m', '--mode', help='Find Cut Directed', required = True)
 	parser.add_argument('-s', '--using_start', help='Find Cut Directed', required = True)
 	parser.add_argument('-H', '--heuristic', help='Find Cut Directed', required = False)
+	parser.add_argument('-i', '--induced', help='Find Cut Directed', required = False)
+
+	# mode: 
+	# 	1: all to all
+	# 	2: all non important to important
+	# 	3: non induced cut
+
 
 	# CUSTOMER_DEGREE = 1
 	# PROVIDER_DEGREE = 2
@@ -382,15 +455,26 @@ if __name__ == "__main__":
 	heuristic = args.heuristic
 	if not heuristic == None:
 		heuristic = int(heuristic)
+	induced = args.induced
 
-	#Create our class object
+
+
 	NC = NodeCutDirected(COUNTRY_CODE, MODE, using_start, heuristic)
 
 	# Call node cut implementation
-	if MODE == "2":
-		NC.node_cut_to_important()
-	else:
-		NC.node_cut_to_all()
+	if induced == None:
+		print 'Using Induced DiGraph'
+		if MODE == "2":
+			NC.node_cut_to_important()
+		elif MODE == "1":
+			NC.node_cut_to_all()
+
+	elif induced == 'n' or induced == 'N':
+		if MODE == "2":
+			NC.node_cut_non_induced_to_important()
+		elif MODE == "1":
+			NC.node_cut_non_induced_to_all()
+
 
 
 
