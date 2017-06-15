@@ -16,6 +16,18 @@ import argparse
 #local imports
 import constants
 
+def get_mapping_dict(BIT16_TO_AS_MAPPING) :
+	"""Save 16bit to AS mapping in a dict.
+	"""
+	mapping_dict=dict()
+	with open(BIT16_TO_AS_MAPPING) as fi:
+		for line in fi:
+			ll=line[:len(line)-1]
+			splits=ll.split(' ')
+			if not splits[0] in mapping_dict:
+				mapping_dict[splits[0]]=splits[1]
+	return mapping_dict
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description = 'convert cbgp traceroute paths to gao format')
@@ -38,8 +50,14 @@ if __name__ == "__main__":
 	elif MODE == "G":
 		SUFFIX = "_imp_govt"
 		SUFFIX_INCLUDING_OUTSIDE = "_imp_govt_including_outside"
+	elif MODE == "D":
+		SUFFIX = "_imp_dns"
+		SUFFIX_INCLUDING_OUTSIDE = "_imp_dns_including_outside"
 
 	AS_FILE = constants.TEST_DATA + COUNTRY_CODE + "_AS.txt"
+
+	BIT16_TO_AS_MAPPING = constants.TEST_DATA + 'cbgp_16bit2AS_caida_map.txt'
+	mapping_dict = get_mapping_dict(BIT16_TO_AS_MAPPING)
 
 	all_country_as = set()
 	with open(AS_FILE) as fi:
@@ -63,23 +81,32 @@ if __name__ == "__main__":
 
 	with open(in_file) as fi:
 		for line in fi:
-			ll=line[:len(line)-1]
-			print ll
-			splits=ll.split('\t')
+			ll=line.strip()
+			
+			splits=ll.split()
 			print splits
 			if splits[2]=='UNREACHABLE':
 				print ll
 				continue
-			prefix = splits[1]
-			path = splits[3]
-			psplits = path.split(' ')
-			gaopath = ''
-			gaopath_including_outside = ''
-			for idx in range(len(psplits)-1, -1, -1):
-				gaopath_including_outside=gaopath_including_outside+psplits[idx]+' '
-				if psplits[idx] in all_country_as:
-					gaopath=gaopath+psplits[idx]+' '
-			gaopath=gaopath[:len(gaopath)-1]
-			gaopath=prefix+' '+gaopath
-			fo.write(gaopath+'\n')
+
+			prefix = splits[1]	
+			line_to_write = prefix
+			for idx in range(len(splits) - 1, 2, -1):
+				if mapping_dict[splits[idx]] in all_country_as:
+					line_to_write = line_to_write + " " + splits[idx]
+			line_to_write = line_to_write + "\n"
+			print line_to_write
+			fo.write(line_to_write)
+			
+			# path = splits[3]
+			# psplits = path.split(' ')
+			# gaopath = ''
+			# gaopath_including_outside = ''
+			# for idx in range(len(psplits)-1, -1, -1):
+			# 	gaopath_including_outside=gaopath_including_outside+psplits[idx]+' '
+			# 	if psplits[idx] in all_country_as:
+			# 		gaopath=gaopath+psplits[idx]+' '
+			# gaopath=gaopath[:len(gaopath)-1]
+			# gaopath=prefix+' '+gaopath
+			# fo.write(gaopath+'\n')
 	fo.close()
