@@ -1,4 +1,4 @@
-	# !/usr/bin/env python
+# !/usr/bin/env python
 # Name :  Madhur Rawat
 # Organization: IIIT Delhi
 # Date : 15/12/16
@@ -31,10 +31,12 @@ from min_cut_utility import print_path_if_reachable
 from as_graph_utility import as_digraph
 from as_graph_utility import is_reachable
 from as_graph_utility import paths_between_st
+from as_graph_utility import auxiliary_graph
 from minimum_st_node_cut import multiple_minimum_st_node_cut
 from minimum_st_node_cut import zero_capacity_residual_paths
 from heuristic_min_st_node_cut_impl import defense_st_cut
 from heuristic_min_st_node_cut_impl import defense_cut_non_induced
+from heuristic_min_st_node_cut_impl import set_heuristic_weight
 
 
 '''
@@ -106,13 +108,13 @@ class NodeCutDirected :
 			self.selected_domains.append(selected_imp)
 
 			domain = self.DOMAINS[int(selected_imp) - 1]
-			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + '_' + domain + '.txt'
+			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE + '_' + domain + '.txt'
 
 			# donot use. use all_dest_as instead from actual paths
 			dest_as_list = []
 			self.add_dest_as(domain_file, dest_as_list)
 
-			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
+			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
 			# PATH_FILE = constants.TEST_DATA + "IL_gao_cbgp_paths_country_all.txt"
 			print "PATH_FILE " + PATH_FILE
 			
@@ -164,7 +166,7 @@ class NodeCutDirected :
 
 							print i, 'AS', AS, 'dest', dest
 							
-							defense_cut = defense_st_cut(G, AS, dest, self.HEURISTIC)
+							defense_cut = defense_st_cut(G, AS, dest)
 							print '* defense_cut', defense_cut
 							print '*'*50
 							union.update(defense_cut)
@@ -239,20 +241,20 @@ class NodeCutDirected :
 			self.selected_domains.append(selected_imp)
 
 			domain = self.DOMAINS[int(selected_imp) - 1]
-			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + '_' + domain + '.txt'
+			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE + '_' + domain + '.txt'
 
 			# donot use. use all_dest_as instead from actual paths
 			dest_as_list = []
 			self.add_dest_as(domain_file, dest_as_list)
 
-			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE+"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
+			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE +"_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
 			print "PATH_FILE " + PATH_FILE
 
 			defense_cut_non_induced(PATH_FILE, self.HEURISTIC)
 
 
 	def node_cut_non_induced_to_all(self):
-		PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
+		PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
 		print "PATH_FILE " + PATH_FILE
 
 		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
@@ -261,14 +263,17 @@ class NodeCutDirected :
 			
 
 	def node_cut_to_all(self) :
-		PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
+		PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE  + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
 		print "PATH_FILE " + PATH_FILE
 
 		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
 		(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, None)
+		set_heuristic_weight(G, self.HEURISTIC)
+		A = auxiliary_graph(G)
 		union = set()
+		new_union = set()
 		print 'len(G.nodes())', len(G.nodes())
-		ASFILE = constants.TEST_DATA + self.COUNTRY_CODE + "_AS.txt"
+		ASFILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE  + "_AS.txt"
 		fi = open(ASFILE)
 		asset = set()
 		print 'G.nodes()', G.nodes()
@@ -304,6 +309,7 @@ class NodeCutDirected :
 			print "len(all_dest_as) " + str(len(all_dest_as))
 			print
 			count = 0
+			freq_of_node_in_cut = dict()
 
 			# predecessors = set()
 			# for dest in all_dest_as:
@@ -312,7 +318,7 @@ class NodeCutDirected :
 			# print 'dest predecessors ', predecessors
 			# print 'len dest predecessors ', len(predecessors)
 			# exit()
-
+			counter = 0
 			for i, AS in enumerate(all_start_as):
 				for dest in all_dest_as:
 					if not dest == AS:
@@ -334,14 +340,19 @@ class NodeCutDirected :
 						# test SnT for edge in R and not in G. Issue was iteration over R edges not G edges
 						# AS = '9071'
 						# dest = '20841'
-
-						# AS = '9116'
-						# dest = '44282'
+						
 						print i, 'AS', AS, 'dest', dest
-						defense_cut = defense_st_cut(G, AS, dest, self.HEURISTIC)
+						H = A.copy()
+						defense_cut = defense_st_cut(H, AS, dest)
 						print '* defense_cut', defense_cut
 						print '*'*50
+						
 						union.update(defense_cut)
+						for node in defense_cut:
+							if node in freq_of_node_in_cut:
+								freq_of_node_in_cut[node] = freq_of_node_in_cut[node] + 1
+							else:
+								freq_of_node_in_cut[node] = 1
 						
 						# tot_weight = 0
 						# for node in defense_cut:
@@ -391,10 +402,50 @@ class NodeCutDirected :
 						# print tot_weight
 						# raw_input("Press any key to continue..............................................................")
 						# print
-					
 
-		print union
+			print 'freq_of_node_in_cut', freq_of_node_in_cut
+			H = G.copy()
+			while(len(freq_of_node_in_cut) > 0):
+				maxval = 0
+				maxnode = ""
+				for node in freq_of_node_in_cut:
+					if freq_of_node_in_cut[node] > maxval:
+						maxval = freq_of_node_in_cut[node]
+						maxnode = node
+				
+				H.remove_nodes_from([maxnode])
+				del freq_of_node_in_cut[maxnode]
+				new_union.add(maxnode)
+				reachable = False
+				for i, AS in enumerate(all_start_as):
+					for dest in all_dest_as:
+						if not dest == AS:
+							if AS in H.nodes() and dest in H.nodes():
+								if is_reachable(H, AS, dest):
+									reachable = True
+									break
+					if reachable:
+						print 'Still reachable after removing ', maxnode
+						break
+
+				if not reachable:
+					break
+
+		H = G.copy()
+		H.remove_nodes_from(new_union)
+		for i, AS in enumerate(all_start_as):
+			for dest in all_dest_as:
+				if not dest == AS:
+					if AS in H.nodes() and dest in H.nodes():
+						if is_reachable(H, AS, dest):
+							print 'is_reachable after removing new_union'
+							break
+
+		print 'union', union
 		print "len(union) " + str(len(union))
+		print
+		print 'new_union', new_union
+		print "len(new_union) " + str(len(new_union))
 		print
 		print "len(G.nodes()) " + str(len(G.nodes()))
 		print
@@ -428,11 +479,11 @@ class NodeCutDirected :
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description = 'find cut for defender in directed graph')
-	parser.add_argument('-c', '--country_code', help='Find Cut Directed', required = True)
-	parser.add_argument('-m', '--mode', help='Find Cut Directed', required = True)
-	parser.add_argument('-s', '--using_start', help='Find Cut Directed', required = True)
-	parser.add_argument('-H', '--heuristic', help='Find Cut Directed', required = False)
-	parser.add_argument('-i', '--induced', help='Find Cut Directed', required = False)
+	parser.add_argument('-c', '--country_code', help='Country code for which cut is to be found', required = True)
+	parser.add_argument('-m', '--mode', help='1: all to all. 2: all to imp', required = True)
+	parser.add_argument('-s', '--using_start', help='S:attach attacker nodes to START N:Donot use START', required = True)
+	parser.add_argument('-H', '--heuristic', help='Interger value for heuristic to use', required = False)
+	parser.add_argument('-i', '--induced', help='N: Donot use induced graph approach', required = False)
 
 	# mode: 
 	# 	1: all to all

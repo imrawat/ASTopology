@@ -1,26 +1,43 @@
 import constants
-cuts = ['15708', '21486', '44282', '21042', '9071', '49771', '20841', '49308', '61102', '20645', '50365', '57862', '5486', '50081', '28783', '12736', '8867', '48068', '31092', '15976', '12400', '47961', '48851', '31162', '13240', '35016', '44367', '31391', '21174', '47177', '47256', '43871', '31578', '49587', '33802', '35392', '50237', '35435', '56804', '57731', '15504', '12749', '39343', '13093', '378', '39274', '43842', '61149', '56914', '29410', '49069', '20800', '21350', '60886', '48627', '49484', '47461', '25565', '42976', '21145', '35560', '12988', '49794', '1680', '44669', '50463', '42925', '15823', '35243', '16061', '8738', '51651', '20598', '43423', '12491', '29165', '15526', '25003', '51385', '31417', '25046', '9116', '12849', '25237', '48163', '42475', '34380', '47766', '62112', '39213', '47956', '60636', '8894', '16159', '8551', '44435', '12802', '57259']
 
-fi = open(constants.TEST_DATA + "IL_gao_cbgp_paths_country_all.txt")
+def get_mapping_dict(BIT16_TO_AS_MAPPING) :
+	"""Save 16bit to AS mapping in a dict.
+	"""
+	mapping_dict=dict()
+	with open(BIT16_TO_AS_MAPPING) as fi:
+		for line in fi:
+			ll=line[:len(line)-1]
+			splits=ll.split(' ')
+			if not splits[0] in mapping_dict:
+				mapping_dict[splits[0]]=splits[1]
+	return mapping_dict
 
-needed = set()
-count = 0
-for line in fi:
-	line = line.strip()
-	splits = line.split()
-	found = False
-	for idx in range(len(splits) - 2, 1, -1):
-		if splits[idx] in cuts:
-			found = True
-			break
+if __name__ == "__main__":
+	cuts = ['37031', '20928', '24835', '24863', '8452', '36992']
+	fi = open(constants.TEST_DATA + "EG/EG_gao_cbgp_paths_country_all.txt")
 
-	if not found and len(splits) > 3:
-		print line
-		count = count + 1
-		for idx in range(len(splits) - 2, 1, -1):
-			needed.add(splits[idx])
+	BIT16_TO_AS_MAPPING = constants.TEST_DATA + 'cbgp_16bit2AS_caida_map.txt'
+	mapping_dict = get_mapping_dict(BIT16_TO_AS_MAPPING)
 
-print 'needed nodes', needed
-print 'count', count
+	needed = set()
+	count = 0
+	for line in fi:
+		line = line.strip()
+		splits = line.split()
+		found = False
+		for idx in range(len(splits) - 1, 0, -1):
+			if mapping_dict[splits[idx]] in cuts:
+				found = True
+				break
 
-	
+
+		if not found:# and len(splits) > 3:
+			print line
+			count = count + 1
+			for idx in range(len(splits) - 1, 0, -1):
+				needed.add(splits[idx])
+
+	print 'nodes in path not found in cut', needed
+	print 'count', count
+
+		

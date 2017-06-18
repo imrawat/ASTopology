@@ -5,6 +5,7 @@ Uses alias as 16bit AS numbers
 """
 
 import sys
+import constants
 import argparse
 
 if __name__ == "__main__":
@@ -15,7 +16,7 @@ if __name__ == "__main__":
 	COUNTRY_CODE = args.country_code
 	print "Since important target prefixes are smaller in number we donot get paths in batches."
 	print "Fetch in batches is done for all to all mappings only."
-	domains = ['bank', 'govt', 'transport']
+	domains = ['bank', 'govt', 'transport', 'dns']
 	print "domains " + str(domains)
 	print "options " + str(range(1, len(domains) + 1))
 
@@ -25,16 +26,16 @@ if __name__ == "__main__":
 		exit()
 
 	#File containing the ASes from which traceroute will be done to prefixes
-	as_list = './'+COUNTRY_CODE+'_AS.txt'
+	as_list = constants.TEST_DATA + COUNTRY_CODE + '_AS.txt'
 
 	#16bit mapped AS list
-	CAIDA_REL_16BIT='./caida_16bit.txt'
+	CAIDA_REL_16BIT = constants.TEST_DATA + 'caida_16bit.txt'
 
 	#AS to its 16bit alias mapping.
-	AS_TO_16BIT_MAPPING='./cbgp_AS216bit_caida_map.txt'
+	AS_TO_16BIT_MAPPING = constants.TEST_DATA + 'cbgp_AS216bit_caida_map.txt'
 
 	# cli file which will add prefixes to AS routers of the country 
-	out_file='./'+COUNTRY_CODE+'_imp'
+	out_file = constants.TEST_DATA + COUNTRY_CODE+'_imp'
 	out_file = out_file + "_" + domains[int(selected_imp)-1]
 	out_file = out_file + ".cli"
 
@@ -75,7 +76,7 @@ if __name__ == "__main__":
 
 	important_prefix_files = []
 	domain = domains[int(selected_imp) - 1]
-	prefix_file = './'+COUNTRY_CODE+'_'+domain+'.txt'
+	prefix_file = constants.TEST_DATA + COUNTRY_CODE+'_'+domain+'.txt'
 
 	print "perfix file : "+prefix_file
 	with open(prefix_file) as fi:
@@ -96,7 +97,8 @@ if __name__ == "__main__":
 
 			# add to mapped 16bit AS instead of actual AS numbers
 			AS_16bit='AS'+mapping_dict[num]
-			prefix = prefix+'/32'
+			if not selected_imp == '4':
+				prefix = prefix+'/32'
 			com = 'bgp router '+AS_16bit+' add network '+prefix
 			# print com
 			fo.write(com+'\n')
@@ -122,7 +124,8 @@ if __name__ == "__main__":
 				continue
 			AS_16bit='AS'+mapping_dict[num]
 			for prefix in prefix_set:
-				prefix = prefix+'/32'
+				if not selected_imp == '4':
+					prefix = prefix+'/32'
 				com = 'bgp router '+AS_16bit+' record-route '+prefix
 				# print com
 				fo.write(com+'\n') 		

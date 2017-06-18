@@ -5,11 +5,15 @@
 
 from __future__ import division
 import math
+import collections
+import operator
+from collections import OrderedDict
 
 
 #local import
 import min_cut_constants
 from as_graph_utility import is_reachable
+from as_graph_utility import compute_degrees
 from min_cut_utility import BFS
 from as_graph_utility import auxiliary_graph
 from minimum_st_edge_cut import min_st_edge_cut
@@ -19,12 +23,16 @@ from minimum_st_edge_cut import min_st_edge_cut
 ''' Takes a list of node_characteristics to be used for heuristic and 
 	sets weight of nodes according to the heuristic
 '''
-def set_heuristic_weight(G, node_characteristics_list):
+def set_heuristic_weight(G, heuristic = None):
 
+	if heuristic == None:
+		heuristic = min_cut_constants.HEURISTIC.PATH_FREQUENCY
+	node_characteristics_list = node_characteristic_list_for_heuristic(heuristic)
+	
 	for node in G.nodes():
 		heuristic_weight = 0
 		for node_characteristic in node_characteristics_list:
-			
+			print 'G.node[node][node_characteristic]', G.node[node][node_characteristic]
 			heuristic_weight = heuristic_weight + G.node[node][node_characteristic]
 		if heuristic_weight > 0:
 			G.node[node][min_cut_constants.HEURISTIC_WEIGHT] = 1/heuristic_weight
@@ -49,23 +57,83 @@ def node_characteristic_list_for_heuristic(heuristic):
 		return [min_cut_constants.ALPHA_CENTRALITY]
 	elif heuristic == min_cut_constants.HEURISTIC.BETWEENNESS_CENTRALITY:
 		return [min_cut_constants.BETWEENNESS_CENTRALITY]
+	elif heuristic == min_cut_constants.HEURISTIC.UNITY:
+		return [min_cut_constants.UNITY]
 
 
+def defense_cut_non_induced(path_file, heuristic = None):
+	if heuristic == None:
+		heuristic = min_cut_constants.HEURISTIC.PATH_FREQUENCY
+	node_characteristics_list = node_characteristic_list_for_heuristic(heuristic)
 
-def defense_st_cut(G, source, sink, heuristic = None):
+	fi = open(path_file)
+
+	paths_dict = dict()
+	path_nums_with_node_dict = dict()
+	heuristic_weight_dict = OrderedDict()
+	
+	path_num = 0
+	for line in fi:
+		line = line.strip()
+		splits = line.split(' ')
+		temp_set=set()
+
+		if len(splits) < 2:
+			continue
+		path_num = path_num + 1
+		
+		paths_dict[path_num] = line
+ 		for idx in range(len(splits) - 2, 1, -1):
+ 			AS = splits[idx]
+ 			
+ 			if AS in path_nums_with_node_dict:
+ 				path_nums_with_node_dict[AS].add(path_num)
+ 			else:
+ 				path_nums_with_node_dict[AS] = set()
+ 				path_nums_with_node_dict[AS].add(path_num)
+
+ 	(customers, providers, peers) = compute_degrees()
+ 	for key in path_nums_with_node_dict:
+ 		if not key in customers:
+ 			customers[key] = {}
+
+ 	mdict = dict()
+ 	for key in customers:
+ 		if key in path_nums_with_node_dict:
+	 		mdict[key] = len(customers[key])
+
+
+	heuristic_weight_dict = collections.OrderedDict(sorted(mdict.items(), key=operator.itemgetter(1), reverse = True))
+	
+	
+	defense_cut = set()
+	while(len(paths_dict) > 0):
+		if len(heuristic_weight_dict) <= 0:
+			break
+		node_highest_weight = list(heuristic_weight_dict)[0]
+		paths_with_highest_node = path_nums_with_node_dict[node_highest_weight]
+		for highest_path_num in paths_with_highest_node:
+			if highest_path_num in paths_dict:
+				del paths_dict[highest_path_num]
+		del heuristic_weight_dict[node_highest_weight]
+		del path_nums_with_node_dict[node_highest_weight]
+		defense_cut.add(node_highest_weight)
+
+	# for key in paths_dict:
+	# 	print key, paths_dict[key]
+
+	print 'len(intermediate nodes)', len(mdict)
+	print 'number of defense nodes', len(defense_cut)
+	print 'len(all_paths)', path_num
+	print 'len(remaining_paths)', len(paths_dict)
+ 	exit()
+
+def defense_st_cut(G, source, sink):
 	
 	AS = source
 	dest = sink
 	
-	if heuristic == None:
-		heuristic = min_cut_constants.HEURISTIC.PATH_FREQUENCY
-	node_characteristics_list = node_characteristic_list_for_heuristic(heuristic)
-	
-	set_heuristic_weight(G, node_characteristics_list)
-
-	A = auxiliary_graph(G)
-	AC = A.copy()
-	R, st_edge_cut = min_st_edge_cut(A, '%sB' % source, '%sA' % sink)
+	R, st_edge_cut = min_st_edge_cut(G, '%sB' % source, '%sA' % sink)
 
 	st_node_cut = set()
 
@@ -80,8 +148,8 @@ def defense_st_cut(G, source, sink, heuristic = None):
 			temp.add(v)
 			st_node_cut.add(AS_source)
 		else:
-			print "Warning. AS_source not equal to AS_sink. Non auxiliary edge cannot be in cut"
-			print "Possibly no node-cut was found"
+			# print "Warning. AS_source not equal to AS_sink. Non auxiliary edge cannot be in cut"
+			# print "Possibly no node-cut was found"
 			break
 
 	return st_node_cut

@@ -125,6 +125,7 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 				currAS = splits[idx]
 				prevAS = splits[idx - 1]
 
+
 				if currAS!=prevAS:	
 					if IS_CBGP:
 						actualCurrentAS = mapping_dict[currAS]
@@ -221,10 +222,12 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 		else:
 			G.node[node][min_cut_constants.CUSTOMER_CONE_SIZE] = 0
 
+		G.node[node][min_cut_constants.UNITY] = 1
+
 	for node in pf_dict:
 		G.node[node][min_cut_constants.PATH_FREQUENCY] = pf_dict[node]
 
-	return (G, all_start_as, all_dest_as, pf_dict)
+	return (G, all_start_as, all_dest_as)
 
 def is_reachable(G, s, d):
 		visited = dict()

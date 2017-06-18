@@ -108,6 +108,7 @@ def min_st_edge_cut(G, source, sink):
     single_st_edge_cut = []
     for i in G.nodes():
         for j in G.neighbors(i):
+
             if visited[i] and not visited[j] and G.edge[i][j][min_cut_constants.HEURISTIC_WEIGHT] > 0.0:
                 
                 single_st_edge_cut.append((i, j))

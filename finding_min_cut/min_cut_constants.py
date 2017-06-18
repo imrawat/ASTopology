@@ -6,7 +6,7 @@ MAXIMUM_POSSIBLE_COMBINATIONS_DIRECTED = 1000000
 # Single node st-cut is preferably the one that is towards the sink/destination.
 MAXIMUM_ALLOWED_ST_CUTS_COMBINATIONS_DIRECTED = 1000
 
-
+# python find_cut_directed.py -c IL -m 1 -s N -H 2
 '''
 Node characteristic that can be used in heuristic weight
 '''
@@ -16,6 +16,7 @@ PEER_DEGREE = 'peer_degree'
 CUSTOMER_CONE_SIZE = 'customer_cone_size'
 ALPHA_CENTRALITY = 'alpha_centrality'
 BETWEENNESS_CENTRALITY = 'betweenness_centrality'
+UNITY = 'unity'
 
 PATH_FREQUENCY = 'path_frequency'
 CAPACITY = 'capacity'
@@ -34,6 +35,7 @@ class HEURISTIC:
 	ALPHA_CENTRALITY = 5
 	BETWEENNESS_CENTRALITY = 6
 	PATH_FREQUENCY = 7
+	UNITY = 8
 
 
 

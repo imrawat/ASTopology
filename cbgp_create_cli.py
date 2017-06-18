@@ -27,7 +27,7 @@ if __name__ == "__main__":
 	NO_OF_PARTITIONS = int(NO_OF_PARTITIONS)
 
 	#File containing the AS number and its corresponding prefix to be added. This prefix will be the same which will be tracerouted.
-	prefix_file = constants.TEST_DATA + COUNTRY_CODE+'_ASPrefixes.txt'
+	prefix_file = constants.TEST_DATA + COUNTRY_CODE + "/"+ COUNTRY_CODE+'_ASPrefixes.txt'
 
 	command = "cat " + prefix_file + " | wc -l"
 	print 'command ', command
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
 
 	#File containing the ASes from which traceroute will be done to prefixes
-	as_list = constants.TEST_DATA + COUNTRY_CODE+'_AS.txt'
+	as_list = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE +'_AS.txt'
 
 	#16bit mapped AS list
 	CAIDA_REL_16BIT = 'caida_16bit.txt'
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 			upto = num_prefixes
 		ffrom = (cli_file_num * max_prefix_per_cli) + 1
 		range_str = str(ffrom) + "to" + str(upto)
-		out_file = constants.TEST_DATA + COUNTRY_CODE + '_country_' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+		out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
 
 		fo = open(out_file, 'w')
 

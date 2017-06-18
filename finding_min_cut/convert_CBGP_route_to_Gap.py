@@ -54,7 +54,7 @@ if __name__ == "__main__":
 		SUFFIX = "_imp_dns"
 		SUFFIX_INCLUDING_OUTSIDE = "_imp_dns_including_outside"
 
-	AS_FILE = constants.TEST_DATA + COUNTRY_CODE + "_AS.txt"
+	AS_FILE = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_AS.txt"
 
 	BIT16_TO_AS_MAPPING = constants.TEST_DATA + 'cbgp_16bit2AS_caida_map.txt'
 	mapping_dict = get_mapping_dict(BIT16_TO_AS_MAPPING)
@@ -68,9 +68,9 @@ if __name__ == "__main__":
 				all_country_as.add(country_AS)
 
 	#File having CBGP format traceroute paths
-	in_file = constants.TEST_DATA + COUNTRY_CODE + "_cbgp_trace" + SUFFIX + ".txt"
-	out_file = constants.TEST_DATA + COUNTRY_CODE + "_gao_cbgp_paths" + SUFFIX + ".txt"
-	out_file_including_outside = constants.TEST_DATA + COUNTRY_CODE + "_gao_cbgp_paths" + SUFFIX_INCLUDING_OUTSIDE + ".txt"
+	in_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_cbgp_trace" + SUFFIX + ".txt"
+	out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_gao_cbgp_paths" + SUFFIX + ".txt"
+	out_file_including_outside = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_gao_cbgp_paths" + SUFFIX_INCLUDING_OUTSIDE + ".txt"
 
 	print 'in_file', in_file
 	print 'out_file', out_file
@@ -85,18 +85,24 @@ if __name__ == "__main__":
 			
 			splits=ll.split()
 			print splits
+			print ll
 			if splits[2]=='UNREACHABLE':
 				print ll
 				continue
 
 			prefix = splits[1]	
 			line_to_write = prefix
+			line_to_write_including_outside = prefix
+
 			for idx in range(len(splits) - 1, 2, -1):
 				if mapping_dict[splits[idx]] in all_country_as:
 					line_to_write = line_to_write + " " + splits[idx]
+				line_to_write_including_outside = line_to_write_including_outside + " " + splits[idx]
 			line_to_write = line_to_write + "\n"
+			line_to_write_including_outside + "\n"
 			print line_to_write
 			fo.write(line_to_write)
+			foio.write(line_to_write_including_outside)
 			
 			# path = splits[3]
 			# psplits = path.split(' ')

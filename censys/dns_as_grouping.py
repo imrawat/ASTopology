@@ -14,8 +14,8 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	COUNTRY_CODE = args.country_code
 
-	in_file = constants.TEST_DATA + "dns_resolvers_" + COUNTRY_CODE + ".csv"
-	out_file = constants.TEST_DATA + COUNTRY_CODE + "_dns.txt"
+	in_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_dns_resolvers" + ".csv"
+	out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE  + "_dns.txt"
 	print "in_file " + in_file
 	print "out_file", out_file
 	fo = open(out_file, "w")
