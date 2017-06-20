@@ -32,7 +32,6 @@ def set_heuristic_weight(G, heuristic = None):
 	for node in G.nodes():
 		heuristic_weight = 0
 		for node_characteristic in node_characteristics_list:
-			print 'G.node[node][node_characteristic]', G.node[node][node_characteristic]
 			heuristic_weight = heuristic_weight + G.node[node][node_characteristic]
 		if heuristic_weight > 0:
 			G.node[node][min_cut_constants.HEURISTIC_WEIGHT] = 1/heuristic_weight

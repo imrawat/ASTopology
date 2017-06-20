@@ -182,18 +182,24 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 	betweenness_centrality_dict = nx.betweenness_centrality(G)
 
 	(customers, providers, peers) = compute_degrees()
-	min_customer_degree = 0
-	min_provider_degree = 0
-	min_peer_degree = 0
+	min_customer_degree = float('inf')
+	min_provider_degree = float('inf')
+	min_peer_degree = float('inf')
 	for AS in customers:
-		if min_customer_degree < len(customers[AS]):
+		if len(customers[AS]) < min_customer_degree:
 			min_customer_degree = len(customers[AS])
 	for AS in providers:
-		if min_provider_degree < len(providers[AS]):
+		if len(providers[AS]) < min_provider_degree:
 			min_provider_degree = len(providers[AS])
 	for AS in peers:
-		if min_peer_degree < len(peers[AS]):
+		if len(peers[AS]) < min_peer_degree:
 			min_peer_degree = len(peers[AS])
+	if min_customer_degree == 1:
+		min_customer_degree = 2
+	if min_provider_degree == 1:
+		min_provider_degree = 2
+	if min_peer_degree == 1:
+		min_peer_degree = 2
 
 	customer_conesize = get_customer_conesize()
 
@@ -206,17 +212,18 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 			G.node[node][min_cut_constants.CUSTOMER_DEGREE] = len(customers[node])
 		else:
 			G.node[node][min_cut_constants.CUSTOMER_DEGREE] = min_customer_degree - 1
+		# print G.node[node][min_cut_constants.CUSTOMER_DEGREE]
 
 		if node in providers:
 			G.node[node][min_cut_constants.PROVIDER_DEGREE] = len(providers[node])
 		else:
 			G.node[node][min_cut_constants.PROVIDER_DEGREE] = min_provider_degree - 1
-
+		# print G.node[node][min_cut_constants.PROVIDER_DEGREE]
 		if node in peers:
 			G.node[node][min_cut_constants.PEER_DEGREE] = len(peers[node])
 		else:
 			G.node[node][min_cut_constants.PEER_DEGREE] = min_peer_degree - 1
-
+		# print G.node[node][min_cut_constants.PEER_DEGREE]
 		if node in customer_conesize:
 			G.node[node][min_cut_constants.CUSTOMER_CONE_SIZE] = customer_conesize[node]
 		else:

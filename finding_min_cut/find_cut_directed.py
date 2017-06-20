@@ -10,7 +10,6 @@ Using either start AS or not
 '''
 
 from __future__ import division
-import matplotlib.pyplot as plt
 import itertools
 import sys
 import math
@@ -28,6 +27,7 @@ import constants
 import min_cut_constants
 from min_cut_utility import BFS
 from min_cut_utility import print_path_if_reachable
+from min_cut_utility import trim_defense_cut
 from as_graph_utility import as_digraph
 from as_graph_utility import is_reachable
 from as_graph_utility import paths_between_st
@@ -79,9 +79,11 @@ class NodeCutDirected :
 		print "Note: IS_CBGP="+str(self.IS_CBGP);
 
 
+
 	def node_cut_to_important(self) :
 		START = 'start'
 		union = set()
+		new_union = set()
 
 		# Every time a new domain is added we will add the paths for it to already created graph
 		G = nx.DiGraph()
@@ -122,36 +124,22 @@ class NodeCutDirected :
 
 			if self.USING_START:
 				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, dest_as_list, G, pf_dict)
+				set_heuristic_weight(G, self.HEURISTIC)
+				A = auxiliary_graph(G)
 				for dest in all_dest_as:
 					print 'START', START, 'dest', dest
-					defense_cut = defense_st_cut(G, START, dest, self.HEURISTIC)
+					defense_cut = defense_st_cut(G, START, dest)
 					print '* defense_cut', defense_cut
 					print '*'*50
 					union.update(defense_cut)
-				print
-				print union
-				print "len(union) " + str(len(union))
-				print
-				print "len(G.nodes()) " + str(len(G.nodes()))
-				print
-
-				H = G.copy()
-				H.remove_nodes_from(defense_cut)
-				print 'is_reachable', is_reachable(G, START, dest)
-				raw_input("Press any key to continue...")
-				print
+				
 
 			else:
 				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, G, pf_dict)
-
-				# predecessors = set()
-				# for dest in all_dest_as:
-				# 	for predecessor in G.predecessors(dest):
-				# 		predecessors.add(predecessor)
-				# print 'dest predecessors ', predecessors
-				# print 'len dest predecessors ', len(predecessors)
-				# exit()
-
+				set_heuristic_weight(G, self.HEURISTIC)
+				A = auxiliary_graph(G)
+				
+				freq_of_node_in_cut = dict()
 				print
 				print "len(all_start_as) " + str(len(all_start_as))
 				print "len(all_dest_as) " + str(len(all_dest_as))
@@ -165,61 +153,31 @@ class NodeCutDirected :
 								continue
 
 							print i, 'AS', AS, 'dest', dest
-							
-							defense_cut = defense_st_cut(G, AS, dest)
+							H = A.copy()
+							defense_cut = defense_st_cut(H, AS, dest)
 							print '* defense_cut', defense_cut
 							print '*'*50
 							union.update(defense_cut)
 							
+							for node in defense_cut:
+								if node in freq_of_node_in_cut:
+									freq_of_node_in_cut[node] = freq_of_node_in_cut[node] + 1
+								else:
+									freq_of_node_in_cut[node] = 1
+				new_union = trim_defense_cut(G, freq_of_node_in_cut, all_start_as, all_dest_as)
 
+			print
+			print 'union', union
+			print "len(union) " + str(len(union))
+			print
+			print 'new_union', new_union
+			print "len(new_union) " + str(len(new_union))
+			print
+			print "len(G.nodes()) " + str(len(G.nodes()))
+			print
 
-							# print 'AS:', AS, ' dest:', dest
-							# max_pf = float('-inf')
-							# max_cut=()
-							# st_cuts, single_st_cut, max_possible_combinations = multiple_minimum_st_node_cut(G, AS, dest)
-							# print 'len(st_cuts)', len(st_cuts)
-							# print 'single_st_cut', single_st_cut
-							# if not max_possible_combinations == None and max_possible_combinations > min_cut_constants.MAXIMUM_POSSIBLE_COMBINATIONS_DIRECTED:
-							# 	st_cuts = []
-							# 	st_cuts.append(single_st_cut)
-							# elif len(st_cuts) > min_cut_constants.MAXIMUM_ALLOWED_ST_CUTS_COMBINATIONS_DIRECTED:
-							# 	st_cuts = []
-							# 	st_cuts.append(single_st_cut)
-
-
-
-							# for st_cut in st_cuts:
-							# 	H = G.copy()
-							# 	H.remove_nodes_from(st_cut)
-							# 	if not is_reachable(H, AS, dest):
-
-							# 		pf = 0
-							# 		for cut_node in st_cut:
-							# 			pf = pf + pf_dict[cut_node]
-							# 		# print 'st_cut', st_cut,'pf', pf
-							# 		if(pf > max_pf):
-							# 			max_pf = pf
-							# 			max_cut = st_cut
-							# 			tie=False
-							# 		elif (pf == max_pf) and pf>0:
-							# 			tie=True
-							# print str(i), 'max_cut', max_cut, 'max_pf', max_pf
-							# print
-							# union.update(max_cut)
-							
-							# raw_input("Press any key to continue...")
-				print
-				print union
-				print "len(union) " + str(len(union))
-				print
-				print "len(G.nodes()) " + str(len(G.nodes()))
-				print
-
-				H = G.copy()
-				H.remove_nodes_from(defense_cut)
-				print 'is_reachable', is_reachable(G, AS, dest)
-				raw_input("Press any key to continue...")
-				print
+			raw_input("Press any key to continue...")
+			print
 
 	def node_cut_non_induced_to_important(self):
 		done = False
@@ -271,7 +229,7 @@ class NodeCutDirected :
 		set_heuristic_weight(G, self.HEURISTIC)
 		A = auxiliary_graph(G)
 		union = set()
-		new_union = set()
+		
 		print 'len(G.nodes())', len(G.nodes())
 		ASFILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE  + "_AS.txt"
 		fi = open(ASFILE)
@@ -284,7 +242,6 @@ class NodeCutDirected :
 		for node in G.nodes():
 			if node not in asset:
 				print '$', node
-		# exit()
 
 		# Using Start in All to All case does not make much sense.
 		if self.USING_START: 
@@ -311,35 +268,10 @@ class NodeCutDirected :
 			count = 0
 			freq_of_node_in_cut = dict()
 
-			# predecessors = set()
-			# for dest in all_dest_as:
-			# 	for predecessor in G.predecessors(dest):
-			# 		predecessors.add(predecessor)
-			# print 'dest predecessors ', predecessors
-			# print 'len dest predecessors ', len(predecessors)
-			# exit()
 			counter = 0
 			for i, AS in enumerate(all_start_as):
 				for dest in all_dest_as:
 					if not dest == AS:
-						
-						# Donot delete these test values for IL all.
-						# AS = '5580'
-						# dest = '12400'
-						# AS = '5580'
-						# dest = '20473'
-						# AS = '12400'
-						# dest = '2914'
-						# AS = '12400'
-						# dest = '174'
-
-						# test S n T for unequal cardinality for st-cut by both method. IL country all
-						# AS = '200742'
-						# dest = '35435'
-
-						# test SnT for edge in R and not in G. Issue was iteration over R edges not G edges
-						# AS = '9071'
-						# dest = '20841'
 						
 						print i, 'AS', AS, 'dest', dest
 						H = A.copy()
@@ -354,92 +286,7 @@ class NodeCutDirected :
 							else:
 								freq_of_node_in_cut[node] = 1
 						
-						# tot_weight = 0
-						# for node in defense_cut:
-						# 	print node, 'pf ',G.node[node]['path_frequency']
-						# 	tot_weight = tot_weight+G.node[node][min_cut_constants.HEURISTIC_WEIGHT]
-						# print tot_weight
-
-
-
-						# from heuristic_min_st_node_cut_impl import set_heuristic_weight
-						# set_heuristic_weight(G, [min_cut_constants.PATH_FREQUENCY])
-
-						# max_pf = float('-inf')
-						# max_cut=()
-						# st_cuts, single_st_cut, max_possible_combinations = multiple_minimum_st_node_cut(G, AS, dest)
-						
-						# if not max_possible_combinations == None and max_possible_combinations > min_cut_constants.MAXIMUM_POSSIBLE_COMBINATIONS_DIRECTED:
-						# 	st_cuts = []
-						# 	st_cuts.append(single_st_cut)
-						# elif len(st_cuts) > min_cut_constants.MAXIMUM_ALLOWED_ST_CUTS_COMBINATIONS_DIRECTED:
-						# 	st_cuts = []
-						# 	st_cuts.append(single_st_cut)
-		
-
-						# for st_cut in st_cuts:
-						# 	H = G.copy()
-						# 	H.remove_nodes_from(st_cut)
-
-						# 	if not is_reachable(H, AS, dest):
-						# 		pf = 0
-						# 		for cut_node in st_cut:
-						# 			pf = pf + pf_dict[cut_node]
-						# 		print 'possible', st_cut,'pf', pf
-						# 		if(pf > max_pf):
-						# 			max_pf = pf
-						# 			max_cut = st_cut
-						# 			tie=False
-						# 		elif (pf == max_pf) and pf>0:
-						# 			tie=True
-						
-						# union.update(max_cut)
-						# print '* max_cut', max_cut
-						# tot_weight = 0
-						# for node in max_cut:
-						# 	print node, G.node[node]['path_frequency']
-						# 	tot_weight = tot_weight + (1/G.node[node]['path_frequency'])
-						# print tot_weight
-						# raw_input("Press any key to continue..............................................................")
-						# print
-
-			print 'freq_of_node_in_cut', freq_of_node_in_cut
-			H = G.copy()
-			while(len(freq_of_node_in_cut) > 0):
-				maxval = 0
-				maxnode = ""
-				for node in freq_of_node_in_cut:
-					if freq_of_node_in_cut[node] > maxval:
-						maxval = freq_of_node_in_cut[node]
-						maxnode = node
-				
-				H.remove_nodes_from([maxnode])
-				del freq_of_node_in_cut[maxnode]
-				new_union.add(maxnode)
-				reachable = False
-				for i, AS in enumerate(all_start_as):
-					for dest in all_dest_as:
-						if not dest == AS:
-							if AS in H.nodes() and dest in H.nodes():
-								if is_reachable(H, AS, dest):
-									reachable = True
-									break
-					if reachable:
-						print 'Still reachable after removing ', maxnode
-						break
-
-				if not reachable:
-					break
-
-		H = G.copy()
-		H.remove_nodes_from(new_union)
-		for i, AS in enumerate(all_start_as):
-			for dest in all_dest_as:
-				if not dest == AS:
-					if AS in H.nodes() and dest in H.nodes():
-						if is_reachable(H, AS, dest):
-							print 'is_reachable after removing new_union'
-							break
+			new_union = trim_defense_cut(G, freq_of_node_in_cut, all_start_as, all_dest_as)
 
 		print 'union', union
 		print "len(union) " + str(len(union))

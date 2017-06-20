@@ -5,6 +5,7 @@
 
 #local imports
 import min_cut_constants
+from as_graph_utility import is_reachable
 
 ''' Find if reachable and prints the path through which sink is reachable
 '''
@@ -108,3 +109,44 @@ def initVisited(G):
     for v in G.nodes():
         visited[v] = False
     return visited
+
+def trim_defense_cut(G, freq_of_node_in_cut, all_start_as, all_dest_as):
+    print 'freq_of_node_in_cut', freq_of_node_in_cut
+    new_union = set()
+    H = G.copy()
+    while(len(freq_of_node_in_cut) > 0):
+        maxval = 0
+        maxnode = ""
+        for node in freq_of_node_in_cut:
+            if freq_of_node_in_cut[node] > maxval:
+                maxval = freq_of_node_in_cut[node]
+                maxnode = node
+        
+        H.remove_nodes_from([maxnode])
+        del freq_of_node_in_cut[maxnode]
+        new_union.add(maxnode)
+        reachable = False
+        for i, AS in enumerate(all_start_as):
+            for dest in all_dest_as:
+                if not dest == AS:
+                    if AS in H.nodes() and dest in H.nodes():
+                        if is_reachable(H, AS, dest):
+                            reachable = True
+                            break
+            if reachable:
+                print 'Still reachable after removing ', maxnode
+                break
+        if not reachable:
+            break
+
+    H = G.copy()
+    H.remove_nodes_from(new_union)
+    for i, AS in enumerate(all_start_as):
+        for dest in all_dest_as:
+            if not dest == AS:
+                if AS in H.nodes() and dest in H.nodes():
+                    if is_reachable(H, AS, dest):
+                        print 'is_reachable after removing new_union'
+                        break
+
+    return new_union
