@@ -13,12 +13,26 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description = 'create cli for country to country all to all')
 	parser.add_argument('-c', '--country_code', help='create cli file all to all', required = True)
+	parser.add_argument('-m', '--mode', help='convert to gao', required = True)
 	parser.add_argument('-p', '--number_of_partitions', help='number of partitions for cli file', required = True)
 
 
 	args = parser.parse_args()
 	COUNTRY_CODE = args.country_code
 	NO_OF_PARTITIONS = args.number_of_partitions
+	MODE = args.mode
+
+	if MODE == 'C':
+		SUFFIX = "_ASPrefixes"
+	elif MODE == 'T':
+		SUFFIX = "_transport"
+	elif MODE == "B":
+		SUFFIX = "_bank"
+	elif MODE == "G":
+		SUFFIX = "_govt"
+	elif MODE == "D":
+		SUFFIX = "_dns"
+
 
 	if not NO_OF_PARTITIONS.isdigit():
 		print "Invalid number of partitions"
@@ -27,7 +41,8 @@ if __name__ == "__main__":
 	NO_OF_PARTITIONS = int(NO_OF_PARTITIONS)
 
 	#File containing the AS number and its corresponding prefix to be added. This prefix will be the same which will be tracerouted.
-	prefix_file = constants.TEST_DATA + COUNTRY_CODE + "/"+ COUNTRY_CODE+'_ASPrefixes.txt'
+
+	prefix_file = constants.TEST_DATA + COUNTRY_CODE + "/"+ COUNTRY_CODE + SUFFIX + ".txt"
 
 	command = "cat " + prefix_file + " | wc -l"
 	print 'command ', command
@@ -76,7 +91,10 @@ if __name__ == "__main__":
 			upto = num_prefixes
 		ffrom = (cli_file_num * max_prefix_per_cli) + 1
 		range_str = str(ffrom) + "to" + str(upto)
-		out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+		if MODE == "C":			
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+		else:
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + "_" + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
 
 		fo = open(out_file, 'w')
 
@@ -103,9 +121,13 @@ if __name__ == "__main__":
 					break
 				ll = line.strip()
 				splits=ll.split(' ')
-				AS = splits[0]
-				num=AS[2:]
-				prefix = splits[1]
+				if MODE == "C":
+					AS = splits[0]
+					num=AS[2:]
+					prefix = splits[1]
+				else:
+					num = splits[2]
+					prefix = splits[3]
 
 				if not num in mapping_dict:
 					print num+' prefix AS not in caida'
