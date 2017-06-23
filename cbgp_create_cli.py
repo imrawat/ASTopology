@@ -1,13 +1,16 @@
-"""
-cbgp_create_cli.py
-Create a .cli file for C-BGP which will load prefixes to AS and 
-use traceroute to get path from AS to a particular prefix.
-Uses alias as 16bit AS numbers
-"""
+''' cbgp_create_cli.py
+	Create a .cli file for C-BGP which will load prefixes to AS and 
+	use traceroute to get path from AS to a particular prefix.
+	Uses alias as 16bit AS numbers
+'''
 import sys
 import argparse
-import constants
 import commands
+
+# Local imports
+import constants
+from checkForSameNetwork import get_network_for_prefix
+
 
 if __name__ == "__main__":
 
@@ -22,7 +25,7 @@ if __name__ == "__main__":
 	NO_OF_PARTITIONS = args.number_of_partitions
 	MODE = args.mode
 
-	if MODE == 'C':
+	if MODE == 'C' or MODE == "G2C" or MODE == "g2c":
 		SUFFIX = "_ASPrefixes"
 	elif MODE == 'T':
 		SUFFIX = "_transport"
@@ -41,7 +44,6 @@ if __name__ == "__main__":
 	NO_OF_PARTITIONS = int(NO_OF_PARTITIONS)
 
 	#File containing the AS number and its corresponding prefix to be added. This prefix will be the same which will be tracerouted.
-
 	prefix_file = constants.TEST_DATA + COUNTRY_CODE + "/"+ COUNTRY_CODE + SUFFIX + ".txt"
 
 	command = "cat " + prefix_file + " | wc -l"
@@ -56,6 +58,8 @@ if __name__ == "__main__":
 
 	#File containing the ASes from which traceroute will be done to prefixes
 	as_list = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE +'_AS.txt'
+	if MODE == "g2c" or MODE == "G2C":
+		as_list = constants.TEST_DATA + "all_as.txt"
 
 	#16bit mapped AS list
 	CAIDA_REL_16BIT = 'caida_16bit.txt'
@@ -64,8 +68,7 @@ if __name__ == "__main__":
 	AS_TO_16BIT_MAPPING = constants.TEST_DATA + 'cbgp_AS216bit_caida_map.txt'	
 
 
-	"""
-	Save AS to 16bit mapping in a dict.
+	""" Save AS to 16bit mapping in a dict.
 	"""
 	mapping_dict=dict()
 	with open(AS_TO_16BIT_MAPPING) as fi:
@@ -76,9 +79,8 @@ if __name__ == "__main__":
 				mapping_dict[splits[0]]=splits[1]
 
 
-	"""
-	add prefixes to CBGP routers. Router numbers are mapping of 
-	actual AS numbers to 16bit aliases.
+	""" Add prefixes to CBGP routers. Router numbers are mapping of 
+		actual AS numbers to 16bit aliases.
 	"""
 
 	for cli_file_num in range(0, NO_OF_PARTITIONS + 1):
@@ -86,13 +88,15 @@ if __name__ == "__main__":
 		
 		# cli file which will add prefixes to AS routers of the country 
 		upto = (cli_file_num + 1) * max_prefix_per_cli
-		print upto > num_prefixes
+		
 		if upto > num_prefixes:
 			upto = num_prefixes
 		ffrom = (cli_file_num * max_prefix_per_cli) + 1
 		range_str = str(ffrom) + "to" + str(upto)
 		if MODE == "C":			
 			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+		elif MODE == "G2C" or MODE == "g2c":
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_g2c' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
 		else:
 			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + "_" + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
 
@@ -110,6 +114,7 @@ if __name__ == "__main__":
 		fo.write('sim run\n')
 
 		prefix_set = set()
+		network_set = set()
 
 		line_num = 0
 		with open(prefix_file) as fi:
@@ -121,7 +126,7 @@ if __name__ == "__main__":
 					break
 				ll = line.strip()
 				splits=ll.split(' ')
-				if MODE == "C":
+				if MODE == "C" or MODE == "G2C" or MODE == "g2c":
 					AS = splits[0]
 					num=AS[2:]
 					prefix = splits[1]
@@ -132,8 +137,17 @@ if __name__ == "__main__":
 				if not num in mapping_dict:
 					print num+' prefix AS not in caida'
 					continue
-				if not prefix in prefix_set:
+
+				network = get_network_for_prefix(prefix)
+
+				if network in network_set:
+					print prefix, "network already exists"
+					continue
+
+				if not prefix in prefix_set: #should not be required after network check. but still...
 					prefix_set.add(prefix)
+
+				network_set.add(network)
 
 				# add to mapped 16bit AS instead of actual AS numbers
 				AS_16bit='AS'+mapping_dict[num]
@@ -145,7 +159,8 @@ if __name__ == "__main__":
 				fo.write('print '+"\""+str(line_num)+' '+com+":\"   \n")
 				fo.write('time diff   \n')
 			
-		print
+		print "len(prefix_set)", len(prefix_set)
+		print "prefix_set", prefix_set
 		print
 		"""
 		traceroute commands

@@ -3,12 +3,11 @@
 # Organization: IIIT Delhi
 # Date : 30/12/16
 
-"""
-Convert CBGP traceroute paths to GAO output 
-format paths.
+""" Convert CBGP traceroute paths to GAO output 
+	format paths. Mapping is reverted back during conversion.
 
-CBGP format: 0.0.27.106 130.104.0.0/16 SUCCESS 7018 3303 2611 <where 7018 is start AS and 2611 is home AS consisting of destination prefix>
-GAO format: 130.104.0.0/16 2611 3303 7018
+	CBGP format: 0.0.27.106 130.104.0.0/16 SUCCESS 7018 3303 2611 <where 7018 is start AS and 2611 is home AS consisting of destination prefix>
+	GAO format: 130.104.0.0/16 2611 3303 7018
 """
 
 import argparse
@@ -53,6 +52,9 @@ if __name__ == "__main__":
 	elif MODE == "D":
 		SUFFIX = "_imp_dns"
 		SUFFIX_INCLUDING_OUTSIDE = "_imp_dns_including_outside"
+	elif MODE == "G2C" or MODE == "g2c":
+		SUFFIX = "_g2c"
+		SUFFIX_INCLUDING_OUTSIDE = "_g2c_including_outside"
 
 	AS_FILE = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_AS.txt"
 
@@ -69,6 +71,7 @@ if __name__ == "__main__":
 
 	#File having CBGP format traceroute paths
 	in_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_cbgp_trace" + SUFFIX + ".txt"
+	# in_file = "/Users/Madhur/Google_Drive/Thesis_Mtech/Test_Data/IL/temp.txt"
 	out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_gao_cbgp_paths" + SUFFIX + ".txt"
 	out_file_including_outside = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_gao_cbgp_paths" + SUFFIX_INCLUDING_OUTSIDE + ".txt"
 
@@ -80,12 +83,13 @@ if __name__ == "__main__":
 	foio = open(out_file_including_outside, 'w')
 
 	with open(in_file) as fi:
+		line_num = 0
 		for line in fi:
 			ll=line.strip()
+			line_num = line_num + 1
 			
 			splits=ll.split()
-			print splits
-			print ll
+			print line_num
 			if splits[2]=='UNREACHABLE':
 				print ll
 				continue
@@ -93,26 +97,15 @@ if __name__ == "__main__":
 			prefix = splits[1]	
 			line_to_write = prefix
 			line_to_write_including_outside = prefix
-
 			for idx in range(len(splits) - 1, 2, -1):
 				if mapping_dict[splits[idx]] in all_country_as:
-					line_to_write = line_to_write + " " + splits[idx]
-				line_to_write_including_outside = line_to_write_including_outside + " " + splits[idx]
+					line_to_write = line_to_write + " " + mapping_dict[splits[idx]]
+				line_to_write_including_outside = line_to_write_including_outside + " " + mapping_dict[splits[idx]]
 			line_to_write = line_to_write + "\n"
-			line_to_write_including_outside + "\n"
-			print line_to_write
+			line_to_write_including_outside = line_to_write_including_outside + "\n"
+			# print line_to_write
+			# print line_to_write_including_outside
 			fo.write(line_to_write)
 			foio.write(line_to_write_including_outside)
-			
-			# path = splits[3]
-			# psplits = path.split(' ')
-			# gaopath = ''
-			# gaopath_including_outside = ''
-			# for idx in range(len(psplits)-1, -1, -1):
-			# 	gaopath_including_outside=gaopath_including_outside+psplits[idx]+' '
-			# 	if psplits[idx] in all_country_as:
-			# 		gaopath=gaopath+psplits[idx]+' '
-			# gaopath=gaopath[:len(gaopath)-1]
-			# gaopath=prefix+' '+gaopath
-			# fo.write(gaopath+'\n')
+
 	fo.close()
