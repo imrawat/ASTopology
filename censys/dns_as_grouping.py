@@ -34,21 +34,22 @@ if __name__ == "__main__":
 				as_num = splits[4]
 				routed_prefix = splits[5]
 				as_name = splits[6]
+				ip = splits[0]
 				as_name = as_name.replace(" ", "_")
-				print as_name
+				print curr_line
 				if as_num in as_dict:
 					t_list = as_dict[as_num]
-					if not (routed_prefix, as_name) in t_list:
-						t_list.append((routed_prefix, as_name))
+					if not (ip, routed_prefix, as_name) in t_list:
+						t_list.append((ip, routed_prefix, as_name))
 				else:
 					t_list = []
-					t_list.append((routed_prefix, as_name))
+					t_list.append((ip, routed_prefix, as_name))
 					as_dict[as_num] = t_list
 
 	sorted_as_dict = collections.OrderedDict(sorted(as_dict.items()))
 
 	for key, val in sorted_as_dict.iteritems():
-		line_to_write = val[0][1] + " " + val[0][0] + " " + key + " " + str(len(val))
-		print line_to_write
+		line_to_write = val[0][2] + " " + val[0][0] + " " + key + " "  + val[0][1] + " " + str(len(val))
+		
 		fo.write(line_to_write + "\n")
 

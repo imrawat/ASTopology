@@ -116,10 +116,14 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 			
 			if len(splits) < 2:
 				continue
-
+		
 			if not splits[1] == "SUCCESS":
-				all_start_as.add(mapping_dict[splits[len(splits) - 1]])
-				all_dest_as.add(mapping_dict[splits[1]])
+				if IS_CBGP:
+					all_start_as.add(mapping_dict[splits[len(splits) - 1]])
+					all_dest_as.add(mapping_dict[splits[1]])
+				else:
+					all_start_as.add(splits[len(splits) - 1])
+					all_dest_as.add(splits[1])
 
 			for idx in range(len(splits) - 1, 1, -1): #upto before start AS index.
 				currAS = splits[idx]
@@ -176,7 +180,6 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 								G.edge[START][prevAS][min_cut_constants.CAPACITY] = 1
 
 				if currAS=="SUCCESS":
-					
 					print splits
 
 	betweenness_centrality_dict = nx.betweenness_centrality(G)
@@ -332,17 +335,17 @@ def paths_between_st(G ,source, sink):
 if __name__ == "__main__":
 
 	# Test auxiliary graph
-	# G = nx.DiGraph()
-	# G.add_nodes_from((4,5,6))
-	# G.node[4][min_cut_constants.HEURISTIC_WEIGHT] = 100
-	# G.node[5][min_cut_constants.HEURISTIC_WEIGHT] = 500
-	# G.node[6][min_cut_constants.HEURISTIC_WEIGHT] = 900
-	# G.add_edge(4,5)
-	# G.add_edge(5,6)
+	G = nx.DiGraph()
+	G.add_nodes_from((4,5,6))
+	G.node[4][min_cut_constants.HEURISTIC_WEIGHT] = 100
+	G.node[5][min_cut_constants.HEURISTIC_WEIGHT] = 500
+	G.node[6][min_cut_constants.HEURISTIC_WEIGHT] = 900
+	G.add_edge(4,5)
+	G.add_edge(5,6)
 
-	# H = auxiliary_graph(G)
-	# for (s,t) in H.edges_iter():
-	# 	print s, t, type(H.edge[s][t])
+	H = auxiliary_graph(G)
+	for (s,t) in H.edges_iter():
+		print s, t, type(H.edge[s][t])
 	compute_degrees()
 
 	

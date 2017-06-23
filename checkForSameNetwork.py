@@ -8,6 +8,53 @@ import argparse
 #local imports	
 import constants
 
+def get_network_for_prefix(prefix):
+	prefsplits = prefix.split("/")
+	if len(prefsplits) < 2:
+		print line + " len(prefsplits) " + str(len(prefsplits)) 
+		return ''
+	mask = prefsplits[1]
+	mask = int(mask)
+	ip = prefsplits[0]
+	ipsplits = ip.split(".")
+	if len(ipsplits) < 4:
+		print line + " len(ipsplits) " + str(len(ipsplits)) 
+		return ''
+	network = ""
+	for d in ipsplits:
+		b = bin(int(d))
+		b = b[2:]
+		while(len(b) < 8):
+			b = "0" + b
+		network = network + b
+	network = network[:mask]
+	
+	return network
+
+def check_same_network(PATH_FILE, MODE):
+	networkdict = dict()
+	with open(INFILE) as fi:
+		for line in fi:
+			line = line.strip()
+			if not line[0] == "#": # Lines with starting# are to be omitted from check or usage
+				splits = line.split()
+				if not MODE == "C":
+					AS = splits[2]
+					prefix = splits[3]
+				else:
+					AS = splits[0]
+					prefix = splits[1]
+
+				network = get_network_for_prefix(prefix)
+				if network in networkdict:
+					networkdict[network].append(AS)
+				else:
+					ASlist = [AS]
+					networkdict[network] = ASlist
+
+	fi.close()
+	for network in networkdict:
+		print network, networkdict[network]
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description = 'Check prefixes list for same prefix. Else CBGP gives error')
@@ -33,44 +80,4 @@ if __name__ == "__main__":
 	print 'INFILE', INFILE
 	print
 
-	networkdict = dict()
-	with open(INFILE) as fi:
-		for line in fi:
-			line = line.strip()
-			if not line[0] == "#":
-				splits = line.split()
-				if not MODE == "C":
-					AS = splits[2]
-					ip = splits[1]
-					mask = 32
-				else:
-					AS = splits[0]
-					prefix = splits[1]
-					prefsplits = prefix.split("/")
-					if len(prefsplits) < 2:
-						print line + " len(prefsplits) " + str(len(prefsplits)) 
-						continue
-					mask = prefsplits[1]
-					mask = int(mask)
-					ip = prefsplits[0]
-				ipsplits = ip.split(".")
-				if len(ipsplits) < 4:
-					print line + " len(ipsplits) " + str(len(ipsplits)) 
-					continue
-				network = ""
-				for d in ipsplits:
-					b = bin(int(d))
-					b = b[2:]
-					while(len(b) < 8):
-						b = "0" + b
-					network = network + b
-				network = network[:mask]
-				if network in networkdict:
-					networkdict[network].append(AS)
-				else:
-					ASlist = [AS]
-					networkdict[network] = ASlist
-
-	fi.close()
-	for network in networkdict:
-		print network, networkdict[network]
+	check_same_network(INFILE, MODE)
