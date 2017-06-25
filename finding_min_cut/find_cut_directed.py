@@ -150,6 +150,7 @@ class NodeCutDirected :
 				print "len(G.edges())", len(G.edges())
 				print
 				for i, AS in enumerate(all_start_as):
+					print i, 'AS', AS
 					for dest in all_dest_as:
 						if not AS == dest :
 
@@ -157,7 +158,7 @@ class NodeCutDirected :
 							if not dest in dest_as_list:
 								continue
 
-							# print i, 'AS', AS, 'dest', dest
+							
 							H = A.copy()
 							defense_cut = defense_st_cut(H, AS, dest)
 							# print '* defense_cut', defense_cut
