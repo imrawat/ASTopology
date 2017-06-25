@@ -87,12 +87,13 @@ class NodeCutDirected :
 		new_union = set()
 
 		# Every time a new domain is added we will add the paths for it to already created graph
-		G = nx.DiGraph()
+		
 
 		# Every time a new domain is added we need to update the pf_dict with new values for nodes.
 		pf_dict = {}
 
 		done = False
+		cumulative_union = set()
 		while (done == False and (not len(self.selected_domains) == self.DOMAINS)):
 			'''
 			Input from user the important locations to which to draw graph to
@@ -102,6 +103,7 @@ class NodeCutDirected :
 			selected_imp = raw_input("Enter space separated choice. Currently single choice only. 0 to EXIT? ")
 			if selected_imp == '0' or selected_imp == 0:
 				done = True
+
 				continue
 			
 			if not selected_imp.isdigit() or (int(selected_imp) - 1) > (len(self.DOMAINS) - 1) or selected_imp in self.selected_domains:
@@ -124,7 +126,7 @@ class NodeCutDirected :
 			mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
 
 			if self.USING_START:
-				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, dest_as_list, G, pf_dict)
+				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, dest_as_list, None, pf_dict)
 				set_heuristic_weight(G, self.HEURISTIC)
 				A = auxiliary_graph(G)
 				for dest in all_dest_as:
@@ -136,7 +138,7 @@ class NodeCutDirected :
 				
 
 			else:
-				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, G, pf_dict)
+				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, pf_dict)
 				set_heuristic_weight(G, self.HEURISTIC)
 				A = auxiliary_graph(G)
 				
@@ -155,11 +157,11 @@ class NodeCutDirected :
 							if not dest in dest_as_list:
 								continue
 
-							print i, 'AS', AS, 'dest', dest
+							# print i, 'AS', AS, 'dest', dest
 							H = A.copy()
 							defense_cut = defense_st_cut(H, AS, dest)
-							print '* defense_cut', defense_cut
-							print '*'*50
+							# print '* defense_cut', defense_cut
+							# print '*'*50
 							union.update(defense_cut)
 							
 							for node in defense_cut:
@@ -178,8 +180,11 @@ class NodeCutDirected :
 			print
 			print "len(G.nodes()) " + str(len(G.nodes()))
 			print
+			cumulative_union.update(new_union)
 			raw_input("Press any key to continue...")
 			print
+		print 'cumulative_union', cumulative_union
+		print 'len(cumulative_union)', len(cumulative_union)
 
 	def node_cut_non_induced_to_important(self):
 		done = False
