@@ -55,6 +55,9 @@ if __name__ == "__main__":
 	elif MODE == "G2C" or MODE == "g2c":
 		SUFFIX = "_g2c"
 		SUFFIX_INCLUDING_OUTSIDE = "_g2c_including_outside"
+	elif MODE == "A2C" or MODE == "a2c":
+		SUFFIX = "_a2c"
+		SUFFIX_INCLUDING_OUTSIDE = "_a2c_including_outside"
 
 	AS_FILE = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + "_AS.txt"
 

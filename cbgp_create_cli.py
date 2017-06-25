@@ -25,7 +25,7 @@ if __name__ == "__main__":
 	NO_OF_PARTITIONS = args.number_of_partitions
 	MODE = args.mode
 
-	if MODE == 'C' or MODE == "G2C" or MODE == "g2c":
+	if MODE == 'C' or MODE == "G2C" or MODE == "g2c" or MODE == "a2c" or MODE == "A2C":
 		SUFFIX = "_ASPrefixes"
 	elif MODE == 'T':
 		SUFFIX = "_transport"
@@ -60,6 +60,8 @@ if __name__ == "__main__":
 	as_list = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE +'_AS.txt'
 	if MODE == "g2c" or MODE == "G2C":
 		as_list = constants.TEST_DATA + "all_as.txt"
+	elif MODE == "a2c" or MODE == "A2C":
+		as_list = constants.TEST_DATA + "bgpranking.txt"
 
 	#16bit mapped AS list
 	CAIDA_REL_16BIT = 'caida_16bit.txt'
@@ -97,6 +99,8 @@ if __name__ == "__main__":
 			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
 		elif MODE == "G2C" or MODE == "g2c":
 			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_g2c' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+		elif MODE == "a2c" or MODE == "A2C":
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_a2c' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
 		else:
 			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + "_" + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
 
@@ -126,7 +130,7 @@ if __name__ == "__main__":
 					break
 				ll = line.strip()
 				splits=ll.split(' ')
-				if MODE == "C" or MODE == "G2C" or MODE == "g2c":
+				if MODE == "C" or MODE == "G2C" or MODE == "g2c" or MODE == "a2c" or MODE == "A2C":
 					AS = splits[0]
 					num=AS[2:]
 					prefix = splits[1]
@@ -167,8 +171,12 @@ if __name__ == "__main__":
 		"""
 		with open(as_list) as fi:
 			for line in fi:
-				ll=line[:len(line)-1]
-				num=ll[2:]
+				ll=line.strip()
+				if not MODE == "a2c" or MODE == "A2C":
+					num=ll[2:]
+				else: 
+					splits = ll.split()
+					num = splits[0]
 				if not num in mapping_dict:
 					print num+' AS not in caida'
 					continue

@@ -16,6 +16,7 @@ PEER_DEGREE = 'peer_degree'
 CUSTOMER_CONE_SIZE = 'customer_cone_size'
 ALPHA_CENTRALITY = 'alpha_centrality'
 BETWEENNESS_CENTRALITY = 'betweenness_centrality'
+KATZ_CENTRALITY = 'katz_centrality'
 UNITY = 'unity'
 
 PATH_FREQUENCY = 'path_frequency'
@@ -32,7 +33,7 @@ class HEURISTIC:
 	PROVIDER_DEGREE = 2
 	PEER_DEGREE = 3
 	CUSTOMER_CONE_SIZE = 4
-	ALPHA_CENTRALITY = 5
+	KATZ_CENTRALITY = 5
 	BETWEENNESS_CENTRALITY = 6
 	PATH_FREQUENCY = 7
 	UNITY = 8

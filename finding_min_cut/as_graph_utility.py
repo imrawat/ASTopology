@@ -183,6 +183,7 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 					print splits
 
 	betweenness_centrality_dict = nx.betweenness_centrality(G)
+	# katz_centrality_dict = nx.katz_centrality(G)
 
 	(customers, providers, peers) = compute_degrees()
 	min_customer_degree = float('inf')
@@ -210,6 +211,7 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 		G.node[node][min_cut_constants.PATH_FREQUENCY] = 0
 
 		G.node[node][min_cut_constants.BETWEENNESS_CENTRALITY] = betweenness_centrality_dict[node]
+		# G.node[node][min_cut_constants.KATZ_CENTRALITY] = katz_centrality_dict[node]
 
 		if node in customers:
 			G.node[node][min_cut_constants.CUSTOMER_DEGREE] = len(customers[node])

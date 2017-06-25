@@ -57,6 +57,8 @@ class NodeCutDirected :
 			self.MODE_SUFFIX = "_country_all"
 		elif mode == "2":
 			self.MODE_SUFFIX = "_imp"
+		elif mode == "3":
+			self.MODE_SUFFIX = "_a2c"
 
 		if using_start == "S":
 			self.USING_START = True
@@ -75,10 +77,9 @@ class NodeCutDirected :
 		self.DOMAINS = constants.DOMAINS
 		
 		# Indicates that path were received from CBGP and therefore 16bit mapping was done possibly.
-		self.IS_CBGP=True
-		print "Note: IS_CBGP="+str(self.IS_CBGP);
-
-
+		# Not required if conversion has already been done before.
+		self.IS_CBGP = False
+		print "Note: IS_CBGP = ", self.IS_CBGP;
 
 	def node_cut_to_important(self) :
 		START = 'start'
@@ -222,6 +223,8 @@ class NodeCutDirected :
 
 	def node_cut_to_all(self) :
 		PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE  + "_gao_cbgp_paths" + self.MODE_SUFFIX + ".txt"
+		# PATH_FILE = "/Users/Madhur/Google_Drive/Thesis_Mtech/Test_Data/EG/EG2EG_finalpaths.txt"
+		# PATH_FILE = "/Users/Madhur/Google_Drive/Thesis_Mtech/Test_Data/EG/EG_gao_cbgp_paths_country_56.txt"
 		print "PATH_FILE " + PATH_FILE
 
 		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
@@ -365,6 +368,8 @@ if __name__ == "__main__":
 		if MODE == "2":
 			NC.node_cut_to_important()
 		elif MODE == "1":
+			NC.node_cut_to_all()
+		elif MODE == "3":
 			NC.node_cut_to_all()
 
 	elif induced == 'n' or induced == 'N':

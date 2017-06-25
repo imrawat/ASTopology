@@ -52,8 +52,8 @@ def node_characteristic_list_for_heuristic(heuristic):
 		return [min_cut_constants.PEER_DEGREE]
 	elif heuristic == min_cut_constants.HEURISTIC.CUSTOMER_CONE_SIZE:
 		return [min_cut_constants.CUSTOMER_CONE_SIZE]
-	elif heuristic == min_cut_constants.HEURISTIC.ALPHA_CENTRALITY:
-		return [min_cut_constants.ALPHA_CENTRALITY]
+	# elif heuristic == min_cut_constants.HEURISTIC.KATZ_CENTRALITY:
+		# return [min_cut_constants.KATZ_CENTRALITY]
 	elif heuristic == min_cut_constants.HEURISTIC.BETWEENNESS_CENTRALITY:
 		return [min_cut_constants.BETWEENNESS_CENTRALITY]
 	elif heuristic == min_cut_constants.HEURISTIC.UNITY:
@@ -82,9 +82,8 @@ def defense_cut_non_induced(path_file, heuristic = None):
 		path_num = path_num + 1
 		
 		paths_dict[path_num] = line
- 		for idx in range(len(splits) - 2, 1, -1):
+ 		for idx in range(len(splits) - 2, 0, -1):
  			AS = splits[idx]
- 			
  			if AS in path_nums_with_node_dict:
  				path_nums_with_node_dict[AS].add(path_num)
  			else:
