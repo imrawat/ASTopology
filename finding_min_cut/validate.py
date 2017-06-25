@@ -13,8 +13,9 @@ def get_mapping_dict(BIT16_TO_AS_MAPPING) :
 	return mapping_dict
 
 if __name__ == "__main__":
-	cuts = ['56149', '23899', '45543', '56147', '131127', '24088', '45903', '131440', '38731', '131403', '38735', '131358', '131366', '45552', '59364', '131390', '55315', '56157', '55313', '45538', '7552', '18403', '7643', '131418', '131349', '131386', '38726', '131369', '55314', '24173', '45896', '38244', '24176', '23962', '45899', '7602', '131344', '55309', '201389']
-	fi = open(constants.TEST_DATA + "VN/VN_gao_cbgp_paths_country_all.txt")
+	cuts = ['60886', '21042', '61102', '57862', '378', '12400', '57731', '48851', '42925', '20598', '12491', '25003', '9116', '12849', '199391', '20645', '5486', '50463', '47956', '60636', '198484', '199270', '1680', '8551', '42976', '57259']
+	fi = open(constants.TEST_DATA + "IL/IL_gao_cbgp_paths_a2c.txt")
+	# fi = open(constants.TEST_DATA + "IL/IL_gao_cbgp_paths_country_all.txt")
 
 	BIT16_TO_AS_MAPPING = constants.TEST_DATA + 'cbgp_16bit2AS_caida_map.txt'
 	mapping_dict = get_mapping_dict(BIT16_TO_AS_MAPPING)
@@ -26,18 +27,19 @@ if __name__ == "__main__":
 		splits = line.split()
 		found = False
 		for idx in range(len(splits) - 1, 0, -1):
-			if mapping_dict[splits[idx]] in cuts:
+			if splits[idx] in cuts:
+			# if mapping_dict[splits[idx]] in cuts:
 				found = True
 				break
 
 
-		if not found:# and len(splits) > 3:
-			print line
+		if not found and len(splits) > 2:
 			count = count + 1
+			print 'path having not cut node ', line
 			for idx in range(len(splits) - 1, 0, -1):
 				needed.add(splits[idx])
 
-	print 'nodes in path not found in cut', needed
-	print 'count', count
+	# print 'len nodes in path not found in cut', len(needed)
+	print 'number of paths not having node from cut ', count
 
 		

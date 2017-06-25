@@ -112,6 +112,19 @@ def initVisited(G):
 
 def trim_defense_cut(G, freq_of_node_in_cut, all_start_as, all_dest_as):
     print 'freq_of_node_in_cut', freq_of_node_in_cut
+
+    original = freq_of_node_in_cut.keys()
+
+    H = G.copy()
+    H.remove_nodes_from(original)
+    for i, AS in enumerate(all_start_as):
+        for dest in all_dest_as:
+            if not dest == AS:
+                if AS in H.nodes() and dest in H.nodes():
+                    if is_reachable(H, AS, dest):
+                        print 'is_reachable after removing original'
+                        break
+
     new_union = set()
     H = G.copy()
     while(len(freq_of_node_in_cut) > 0):

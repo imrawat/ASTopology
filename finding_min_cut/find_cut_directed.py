@@ -144,6 +144,8 @@ class NodeCutDirected :
 				print
 				print "len(all_start_as) " + str(len(all_start_as))
 				print "len(all_dest_as) " + str(len(all_dest_as))
+				print "len(G.nodes())", len(G.nodes())
+				print "len(G.edges())", len(G.edges())
 				print
 				for i, AS in enumerate(all_start_as):
 					for dest in all_dest_as:
@@ -165,9 +167,9 @@ class NodeCutDirected :
 									freq_of_node_in_cut[node] = freq_of_node_in_cut[node] + 1
 								else:
 									freq_of_node_in_cut[node] = 1
+				print 'trimming union'
 				new_union = trim_defense_cut(G, freq_of_node_in_cut, all_start_as, all_dest_as)
 
-			print
 			print 'union', union
 			print "len(union) " + str(len(union))
 			print
@@ -176,7 +178,6 @@ class NodeCutDirected :
 			print
 			print "len(G.nodes()) " + str(len(G.nodes()))
 			print
-
 			raw_input("Press any key to continue...")
 			print
 
