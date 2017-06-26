@@ -90,7 +90,7 @@ def as_graph_undirected(path_file, IS_CBGP, mapping_dict):
 
 	return (G)
 
-def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = None, G = None, pf_dict = None) :
+def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = None, G = None, pf_dict = None, selected_dest_as = None) :
 	# All AS from which traceroute is done. Should have most AS from IL_AS.txt file
 	all_start_as = set()
 	all_dest_as = set()
@@ -116,6 +116,10 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 			
 			if len(splits) < 2:
 				continue
+
+			if not selected_dest_as == None:
+				if not splits[1] in selected_dest_as:
+					continue
 		
 			if not splits[1] == "SUCCESS":
 				if IS_CBGP:
@@ -124,6 +128,8 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 				else:
 					all_start_as.add(splits[len(splits) - 1])
 					all_dest_as.add(splits[1])
+
+
 
 			for idx in range(len(splits) - 1, 1, -1): #upto before start AS index.
 				currAS = splits[idx]

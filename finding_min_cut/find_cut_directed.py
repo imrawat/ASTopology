@@ -15,6 +15,9 @@ import sys
 import math
 import argparse
 import networkx as nx
+import collections
+import operator
+from collections import OrderedDict
 from networkx.algorithms.connectivity import local_node_connectivity
 from collections import defaultdict
 from networkx.algorithms.connectivity import minimum_st_node_cut
@@ -85,13 +88,6 @@ class NodeCutDirected :
 		START = 'start'
 		union = set()
 		new_union = set()
-
-		# Every time a new domain is added we will add the paths for it to already created graph
-		
-
-		# Every time a new domain is added we need to update the pf_dict with new values for nodes.
-		pf_dict = {}
-
 		done = False
 		cumulative_union = set()
 		while (done == False and (not len(self.selected_domains) == self.DOMAINS)):
@@ -103,14 +99,13 @@ class NodeCutDirected :
 			selected_imp = raw_input("Enter space separated choice. Currently single choice only. 0 to EXIT? ")
 			if selected_imp == '0' or selected_imp == 0:
 				done = True
-
 				continue
 			
 			if not selected_imp.isdigit() or (int(selected_imp) - 1) > (len(self.DOMAINS) - 1) or selected_imp in self.selected_domains:
 				print "invalid selected_imp or already selected " + selected_imp
 				continue
 
-			self.selected_domains.append(selected_imp)
+			# self.selected_domains.append(selected_imp)
 
 			domain = self.DOMAINS[int(selected_imp) - 1]
 			domain_file = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE + '_' + domain + '.txt'
@@ -119,6 +114,21 @@ class NodeCutDirected :
 			dest_as_list = []
 			self.add_dest_as(domain_file, dest_as_list)
 
+			selected_dest_as = None
+			if selected_imp == '4':
+				percent = raw_input("Path to what top percent? Enter for 100% ")
+				if not percent == None or not percent.isdigit() :
+					percent = int(percent)
+					if percent < 1 or percent > 100:
+						print percent.isdigit()
+						print percent < 1
+						print percent > 100
+						print 'Invalid percent ', percent
+						exit()
+				selected_dest_as = self.get_top_npercent(domain_file, percent)	
+			print 'selected_dest_as', selected_dest_as			
+
+
 			PATH_FILE = constants.TEST_DATA + self.COUNTRY_CODE + "/" + self.COUNTRY_CODE + "_gao_cbgp_paths" + self.MODE_SUFFIX + "_" + self.DOMAINS[int(selected_imp) - 1] + ".txt"
 			# PATH_FILE = constants.TEST_DATA + "IL_gao_cbgp_paths_country_all.txt"
 			print "PATH_FILE " + PATH_FILE
@@ -126,7 +136,7 @@ class NodeCutDirected :
 			mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
 
 			if self.USING_START:
-				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, dest_as_list, None, pf_dict)
+				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, dest_as_list, None, None, selected_dest_as)
 				set_heuristic_weight(G, self.HEURISTIC)
 				A = auxiliary_graph(G)
 				for dest in all_dest_as:
@@ -138,7 +148,7 @@ class NodeCutDirected :
 				
 
 			else:
-				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, pf_dict)
+				(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, None, selected_dest_as)
 				set_heuristic_weight(G, self.HEURISTIC)
 				A = auxiliary_graph(G)
 				
@@ -172,7 +182,8 @@ class NodeCutDirected :
 									freq_of_node_in_cut[node] = 1
 				print 'trimming union'
 				new_union = trim_defense_cut(G, freq_of_node_in_cut, all_start_as, all_dest_as)
-
+			print 'self.heuristic', self.HEURISTIC
+			print 'percent', percent
 			print 'union', union
 			print "len(union) " + str(len(union))
 			print
@@ -235,7 +246,7 @@ class NodeCutDirected :
 		print "PATH_FILE " + PATH_FILE
 
 		mapping_dict = self.get_mapping_dict(self.BIT16_TO_AS_MAPPING)
-		(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, None)
+		(G, all_start_as, all_dest_as) = as_digraph(PATH_FILE, self.IS_CBGP, self.USING_START, mapping_dict, None, None, None, None)
 		set_heuristic_weight(G, self.HEURISTIC)
 		A = auxiliary_graph(G)
 		union = set()
@@ -308,6 +319,31 @@ class NodeCutDirected :
 		print
 		raw_input("Press any key to continue...")
 		print
+
+	def get_top_npercent(self, PATH_FILE, percentage):
+		fi = open(PATH_FILE)
+		d = dict()
+		total  = 0
+		for line in fi:
+			line = line.strip()
+			splits = line.split()
+			AS = splits[2]
+			dns_advertied = splits[4]
+			d[AS] = int(dns_advertied)
+			total = total + 1
+
+		to_return = (total * percentage) / 100
+
+		MyOrderedDict = collections.OrderedDict(sorted(d.items(), key=operator.itemgetter(1), reverse = True))
+
+		count = 0
+		top_as = []
+		for key in MyOrderedDict:
+			if count > to_return:
+				break
+			count = count + 1
+			top_as.append(key)
+		return top_as
 
 	def get_mapping_dict(self, BIT16_TO_AS_MAPPING) :
 		"""Save 16bit to AS mapping in a dict.
