@@ -114,6 +114,7 @@ class NodeCutDirected :
 			dest_as_list = []
 			self.add_dest_as(domain_file, dest_as_list)
 
+			percent = None
 			selected_dest_as = None
 			if selected_imp == '4':
 				percent = raw_input("Path to what top percent? Enter for 100% ")
@@ -183,7 +184,8 @@ class NodeCutDirected :
 				print 'trimming union'
 				new_union = trim_defense_cut(G, freq_of_node_in_cut, all_start_as, all_dest_as)
 			print 'self.heuristic', self.HEURISTIC
-			print 'percent', percent
+			if not percent == None:
+				print 'percent', percent
 			print 'union', union
 			print "len(union) " + str(len(union))
 			print
@@ -327,13 +329,15 @@ class NodeCutDirected :
 		for line in fi:
 			line = line.strip()
 			splits = line.split()
+
 			AS = splits[2]
 			dns_advertied = splits[4]
 			d[AS] = int(dns_advertied)
 			total = total + 1
 
 		to_return = (total * percentage) / 100
-
+		print 'total', total
+		print 'to_return', to_return
 		MyOrderedDict = collections.OrderedDict(sorted(d.items(), key=operator.itemgetter(1), reverse = True))
 
 		count = 0
