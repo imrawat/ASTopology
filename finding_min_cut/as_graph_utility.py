@@ -129,8 +129,6 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 					all_start_as.add(splits[len(splits) - 1])
 					all_dest_as.add(splits[1])
 
-
-
 			for idx in range(len(splits) - 1, 1, -1): #upto before start AS index.
 				currAS = splits[idx]
 				prevAS = splits[idx - 1]
@@ -191,7 +189,7 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 	betweenness_centrality_dict = nx.betweenness_centrality(G)
 	# katz_centrality_dict = nx.katz_centrality(G)
 
-	(customers, providers, peers) = compute_degrees()
+	(customers, providers, peers, customers_count, provider_count, peers_count) = compute_degrees()
 	min_customer_degree = float('inf')
 	min_provider_degree = float('inf')
 	min_peer_degree = float('inf')
@@ -217,7 +215,6 @@ def as_digraph(path_file, IS_CBGP, USING_START, mapping_dict, dest_as_list = Non
 		G.node[node][min_cut_constants.PATH_FREQUENCY] = 0
 
 		G.node[node][min_cut_constants.BETWEENNESS_CENTRALITY] = betweenness_centrality_dict[node]
-		# G.node[node][min_cut_constants.KATZ_CENTRALITY] = katz_centrality_dict[node]
 
 		if node in customers:
 			G.node[node][min_cut_constants.CUSTOMER_DEGREE] = len(customers[node])
@@ -314,31 +311,44 @@ def compute_degrees():
 			
 			print "Invalid caidarel file"
 			exit()
+	customers_count = {}
+	provider_count = {}
+	peers_count = {}
+
+	for node  in customers:
+		customers_count[node] = len(customers[node])
+	for node  in providers:
+		provider_count[node] = len(providers[node])
+	for node  in peers:
+		peers_count[node] = len(peers[node])
 	
-	return (customers, providers, peers)
+	return (customers, providers, peers, customers_count, provider_count, peers_count)
 
 
-def paths_between_st_util(G, u, d, visited, path):
+def paths_between_st_util(G, u, d, visited, path, num_paths):
 	visited[u]= True
 	path.append(u)
-	
+	print u, d
 	if u ==d:
 	    print 'path: ', list(reversed(path))
+	    num_paths.append(list(reversed(path)))
 	else:
 	    for i in G.neighbors(u):
-
 	        if visited[i]==False:
-	            paths_between_st_util(G, i, d, visited, path)
+	            paths_between_st_util(G, i, d, visited, path, num_paths)
 	path.pop()
 	visited[u]= False
 
 def paths_between_st(G ,source, sink):
-	print 'paths_between_st', source, sink
+	
 	visited = dict()
 	for vertex in G.nodes():
 		visited[vertex] = False
 	path = []
-	paths_between_st_util(G, source, sink,visited, path)
+	num_paths = []
+	paths_between_st_util(G, source, sink,visited, path, num_paths)
+	# print source, sink, len(num_paths)
+	return len(num_paths)
 
 if __name__ == "__main__":
 

@@ -90,7 +90,7 @@ def defense_cut_non_induced(path_file, heuristic = None):
  				path_nums_with_node_dict[AS] = set()
  				path_nums_with_node_dict[AS].add(path_num)
 
- 	(customers, providers, peers) = compute_degrees()
+ 	(customers, providers, peers, customers_count, provider_count, peers_count) = compute_degrees()
  	for key in path_nums_with_node_dict:
  		if not key in customers:
  			customers[key] = {}
@@ -100,9 +100,9 @@ def defense_cut_non_induced(path_file, heuristic = None):
  		if key in path_nums_with_node_dict:
 	 		mdict[key] = len(customers[key])
 
-
+	print mdict
 	heuristic_weight_dict = collections.OrderedDict(sorted(mdict.items(), key=operator.itemgetter(1), reverse = True))
-	
+	print heuristic_weight_dict
 	
 	defense_cut = set()
 	while(len(paths_dict) > 0):
