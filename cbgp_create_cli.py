@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description = 'create cli for country to country all to all')
 	parser.add_argument('-c', '--country_code', help='create cli file all to all', required = True)
-	parser.add_argument('-m', '--mode', help='convert to gao', required = True)
+	parser.add_argument('-m', '--mode', help='', required = True)
 	parser.add_argument('-p', '--number_of_partitions', help='number of partitions for cli file', required = True)
 
 
@@ -94,21 +94,30 @@ if __name__ == "__main__":
 		if upto > num_prefixes:
 			upto = num_prefixes
 		ffrom = (cli_file_num * max_prefix_per_cli) + 1
+		if ffrom > upto:
+			break
 		range_str = str(ffrom) + "to" + str(upto)
 		if MODE == "C":			
-			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_' + str(cli_file_num + 1) + '.cli'
+			out_file_trace = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_country_traceroute_' + str(cli_file_num + 1) + '.cli'
 		elif MODE == "G2C" or MODE == "g2c":
-			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_g2c' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_g2c_' + str(cli_file_num + 1) + '.cli'
+			out_file_trace = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_g2c_traceroute_' + str(cli_file_num + 1) + '.cli'
 		elif MODE == "a2c" or MODE == "A2C":
-			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_a2c' + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_a2c_' + str(cli_file_num + 1) + '.cli'
+			out_file_trace = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_a2c_traceroute_' + str(cli_file_num + 1) + '.cli'
 		else:
-			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + "_" + str(cli_file_num + 1)+ "_" + str(range_str) + '.cli'
+			out_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + "_" + str(cli_file_num + 1) + '.cli'
+			out_file_trace = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + "_traceroute_" + str(cli_file_num + 1) + '.cli'
 
 		fo = open(out_file, 'w')
+		fo_tr = open(out_file_trace, 'w')
 
 		print 'prefix_file : '+prefix_file
 		print 'AS list : '+as_list
-		print 'out_file :'+out_file
+		print 'prefix loading cli :'+out_file
+		print 'traceroute :', out_file_trace
+		print 'range ', str(range_str)
 		raw_input("Press key to continue....................")
 
 		fo.write('bgp topology load --addr-sch=local \"'+CAIDA_REL_16BIT+'\"\n')
@@ -158,10 +167,10 @@ if __name__ == "__main__":
 				com = 'bgp router '+AS_16bit+' add network '+prefix
 				# print com
 				fo.write(com+'\n')
-				fo.write('time save\n')
+				# fo.write('time save\n')
 				fo.write('sim run\n')
-				fo.write('print '+"\""+str(line_num)+' '+com+":\"   \n")
-				fo.write('time diff   \n')
+				# fo.write('print '+"\""+str(line_num)+' '+com+":\"   \n")
+				# fo.write('time diff   \n')	
 			
 		print "len(prefix_set)", len(prefix_set)
 		print "prefix_set", prefix_set
@@ -184,6 +193,6 @@ if __name__ == "__main__":
 				for prefix in prefix_set:
 					com = 'bgp router '+AS_16bit+' record-route '+prefix
 					# print com
-					fo.write(com+'\n') 		
+					fo_tr.write(com+'\n') 		
 
 
