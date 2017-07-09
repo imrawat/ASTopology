@@ -114,7 +114,9 @@ if __name__ == '__main__':
   fo = open('temp.txt', 'w')
 
   cmd_load = 'include ' + loading_file + '\n'
+  print 'load cmd', cmd_load
   cBGP.send(cmd_load)
+  print 'done loading'
   
   fi = open(trace_file)
   for line in fi:
