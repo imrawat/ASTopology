@@ -91,16 +91,16 @@ if __name__ == '__main__':
     SUFFIX = "_a2c_"
     SUFFIX_TRACEROUTE = '_a2c_traceroute_'
   elif MODE == 'T':
-    SUFFIX = "_transport"
+    SUFFIX = "_transport_"
     SUFFIX_TRACEROUTE = "_transport_traceroute_"
   elif MODE == "B":
-    SUFFIX = "_bank"
+    SUFFIX = "_bank_"
     SUFFIX_TRACEROUTE = "_bank_traceroute_"
   elif MODE == "G":
-    SUFFIX = "_govt"
+    SUFFIX = "_govt_"
     SUFFIX_TRACEROUTE = "_govt_traceroute_"
   elif MODE == "D":
-    SUFFIX = "_dns"
+    SUFFIX = "_dns_"
     SUFFIX_TRACEROUTE = "_dns_traceroute_"
 
   loading_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + CLI_NUMBER + '.cli'
