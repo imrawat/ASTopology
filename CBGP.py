@@ -70,8 +70,8 @@ if __name__ == '__main__':
   
 
   parser = argparse.ArgumentParser(description = 'create cli for country to country all to all')
-  parser.add_argument('-c', '--country_code', help='create cli file all to all', required = True)
-  parser.add_argument('-m', '--mode', help='', required = True)
+  parser.add_argument('-c', '--country_code', help='Country Code', required = True)
+  parser.add_argument('-m', '--mode', help='C:Country G2C:Global to Country A2C:Asmatra to Country', required = True)
   parser.add_argument('-p', '--cli_number', help='cli file number', required = True)
 
 
