@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: CBGP
+Version: 0.1
+Summary: Python Interface for the cBGP simulator
+Home-page: http://cbgp.info.ucl.ac.be
+Author: Sebastien Tandel
+Author-email: standel@info.ucl.ac.be
+License: LGPL
+Description: This package is an helper for Python scripts that want to use C-BGP in an interactive way.
+Platform: UNKNOWN
