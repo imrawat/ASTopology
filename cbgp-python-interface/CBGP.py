@@ -9,6 +9,10 @@
 import os, select, Queue, thread, threading, sys, posix, time;
 import fcntl
 import argparse
+
+#local imports
+import sys
+sys.path.append('./finding_min_cut')
 import constants
 
 class CBGP_reader(threading.Thread):
