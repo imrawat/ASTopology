@@ -9,6 +9,7 @@
 import os, select, Queue, thread, threading, sys, posix, time;
 import fcntl
 import argparse
+import constants
 
 class CBGP_reader(threading.Thread):
   rHandle = None
