@@ -12,6 +12,8 @@ import fcntl
 import argparse
 
 #local imports
+import sys
+sys.path.append('./..')
 import constants
 
 class CBGP_reader(threading.Thread):
