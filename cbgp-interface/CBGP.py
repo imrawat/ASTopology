@@ -110,7 +110,7 @@ if __name__ == '__main__':
   loading_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX + CLI_NUMBER + '.cli'
   trace_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + SUFFIX_TRACEROUTE + CLI_NUMBER + '.cli'
 
-  out_cbgp_trace_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_cbgp_trace_' + SUFFIX + '.txt'
+  out_cbgp_trace_file = constants.TEST_DATA + COUNTRY_CODE + "/" + COUNTRY_CODE + '_cbgp_trace' + SUFFIX + '.txt'
 
   print 'prefix loading file', loading_file
   print 'trace_file', trace_file
