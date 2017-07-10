@@ -1,0 +1,56 @@
+Python interface for the C-BGP simulator
+
+
+DESCRIPTION
+
+This package is an helper for Python scripts that want to use C-BGP in
+an interactive way. The package uses a pair of pipes created thanks
+to the os module. Those pipes are used to write to and read
+from a C-BGP instance.
+
+Note that particular attention must be paid to the way the input and
+output are read and written. Since we are in presence of two
+separate processes that are cooperating, deadlocks can occur. Simple
+precaution will avoid most of the problems due to pipe buffering:
+
+ - use the "set autoflush on" statement in the C-BGP script will
+activate an automatic flush of the C-BGP output after the following
+commands: show rib, show rib-in, show networks, show peers and
+record-route. More C-BGP commands will hopefully support this
+feature in the future.
+
+INSTALLATION
+
+1) untar the the archive:
+  tar xzf CBGP-0.1.tar.gz
+
+2) enter the subdirectory CBGP-0.1
+  cd CBGP-0.1
+
+3) install the module :
+  python setup.py install
+
+AUTHORS
+
+Sebastien Tandel (standel@info.ucl.ac.be), from the CSE Department of
+University of Louvain-la-Neuve, in Belgium.
+
+COPYRIGHT
+
+This Python package is provided under the LGPL license. Please have a
+look at the Free Software Foundation (http://www.fsf.org) if you are
+not familiar with this kind of license.
+
+DISCLAIMER
+
+This software is provided ``as is'' and any express or implied
+warranties, including, but not limited to, the implied warranties of
+merchantability and fitness for a particular purpose are disclaimed.
+in no event shall the authors be liable for any direct, indirect,
+incidental, special, exemplary, or consequential damages (including,
+but not limited to, procurement of substitute goods or services; loss
+of use, data, or profits; or business interruption) however caused and
+on any theory of liability, whether in contract, strict liability, or
+tort (including negligence or otherwise) arising in any way out of the
+use of this software, even if advised of the possibility of such
+damage.
